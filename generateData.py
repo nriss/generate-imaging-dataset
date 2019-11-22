@@ -9,7 +9,9 @@ from csbdeep.io import save_training_data
 from csbdeep.data.generate import no_background_patches
 from csbdeep.utils import plot_some
 
+from localizeDots.localize import launchLocalize
 
+launchLocalize("data_ome_tif/net/1_MMStack_Pos0.ome.tif")
 #################
 # TRAINING DATA #
 #################
