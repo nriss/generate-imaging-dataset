@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 
 
-def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask=None, patch_filter=None, verbose=False):
+def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask=None, patch_filter=None, verbose=False, list_common_spots):
     """ sample matching patches of size `patch_size` from all arrays in `datas` """
 
     # TODO: some of these checks are already required in 'create_patches'
@@ -53,18 +53,21 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
     #                  r[1] - patch_size[1] // 2:r[1] + patch_size[1] - patch_size[1] // 2,
     #                  r[2] - patch_size[2] // 2:r[2] + patch_size[2] - patch_size[2] // 2,
     #                  ] for r in zip(*rand_inds)]) for data in datas]
-
-    res = [np.stack([
-                data[
-                    tuple(
-                        slice(
-                            _r - (_p//2),
-                            _r + _p-(_p//2)
+    print(datas)
+    res = [
+            np.stack(
+                [
+                    data[
+                        tuple(
+                            slice(
+                                _r - (_p//2),
+                                _r + _p-(_p//2)
+                            )
+                            for _r,_p in zip(r, patch_size)
                         )
-                        for _r,_p in zip(r, patch_size)
-                    )
-                    ] for r in zip(*rand_inds)
-                ]) for data in datas
+                        ] for r in zip(*rand_inds)
+                    ]
+                ) for data in datas
             ]
 
     return res
@@ -231,11 +234,14 @@ def shuffle_inplace(*arrs,**kwargs):
 
 
 
-
+'''
+Added list common spots to select only common spots.
+'''
 def createPatches(
         raw_data,
         patch_size,
         n_patches_per_image,
+        list_common_spots = None,
         patch_axes    = None,
         save_file     = None,
         transforms    = None,
@@ -361,7 +367,7 @@ def createPatches(
         (channel is None or (isinstance(channel,int) and 0<=channel<x.ndim)) or _raise(ValueError())
         channel is None or patch_size[channel]==x.shape[channel] or _raise(ValueError('extracted patches must contain all channels.'))
 
-        _Y,_X = sample_patches_from_multiple_stacks((y,x), patch_size, n_patches_per_image, mask, patch_filter)
+        _Y,_X = sample_patches_from_multiple_stacks((y,x), patch_size, n_patches_per_image, mask, patch_filter, list_common_spots)
 
         s = slice(i*n_patches_per_image,(i+1) * n_patches_per_image)
         X[s], Y[s] = normalization(_X,_Y, x,y,mask,channel)

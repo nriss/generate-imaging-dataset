@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from createPatches.createPatches import createPatches
 import sys
 
-imageNumber = 0
 ## Patch filter
 np.set_printoptions(threshold=sys.maxsize) #writing entire data (not splitting) may consume time
 
@@ -104,7 +103,7 @@ def generateData(basepath, source_dir, target_dir, n_patches_per_image, list_com
     data = RawData.from_folder(basepath=basepath, source_dirs=[source_dir], target_dir=target_dir, axes='ZYX')
     #print(data.size)
 
-    X, Y, XY_axes = createPatches(data, patch_size=(1, 64,128), n_patches_per_image=n_patches_per_image, verbose=True)
+    X, Y, XY_axes = createPatches(data, patch_size=(1, 64,128), n_patches_per_image=n_patches_per_image, verbose=True, list_common_spots=list_common_spots)
     #print(X, Y)
 
     print("shape of X,Y =", X.shape)
