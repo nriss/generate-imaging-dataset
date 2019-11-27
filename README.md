@@ -12,9 +12,9 @@ Also contains modified patches creation function from CSBDeep (https://github.co
 Getting started
 ---------------
 To work with DatasetMicroscopy :
-- save your image files (*.tif*) in data_ome_tif 
---> net for great quality images
---> flou for bad quality images
-The equivalent images must have the same names.
+1) save your image files (*.tif*) in data_ome_tif  (Equivalent stack images must have the same names)
+- **net** for great quality images
+- **flou** for bad quality images
 
-Then run generateData.py (python generateData.py)
+
+2) Run generateData.py (python generateData.py)
