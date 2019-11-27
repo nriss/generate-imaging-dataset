@@ -7,11 +7,10 @@ import sys, os, warnings
 from tqdm import tqdm
 
 
+#((y,x), patch_size, n_patches_per_image, mask, patch_filter, list_common_spots)
 
-
-def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask=None, patch_filter=None, verbose=False, list_common_spots):
+def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask=None, patch_filter=None, list_common_spots = None, verbose=False):
     """ sample matching patches of size `patch_size` from all arrays in `datas` """
-
     # TODO: some of these checks are already required in 'create_patches'
     len(patch_size)==datas[0].ndim or _raise(ValueError())
 
@@ -33,11 +32,11 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
         datas_mask.dtype == np.bool or _raise(ValueError())
         from scipy.ndimage.filters import minimum_filter
         patch_mask &= minimum_filter(datas_mask, patch_size, mode='constant', cval=False)
-
     # get the valid indices
 
     border_slices = tuple([slice(s // 2, d - s + s // 2 + 1) for s, d in zip(patch_size, datas[0].shape)])
-    valid_inds = np.where(patch_mask[border_slices])
+    # print("patch_mask : ", patch_mask[border_slices])
+    valid_inds = np.where(patch_mask[border_slices]) ## patch_mask[border_slices] contains mask
 
     if len(valid_inds[0]) == 0:
         raise ValueError("'patch_filter' didn't return any region to sample from")
@@ -49,26 +48,60 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
 
     rand_inds = [v[sample_inds] for v in valid_inds]
 
-    # res = [np.stack([data[r[0] - patch_size[0] // 2:r[0] + patch_size[0] - patch_size[0] // 2,
-    #                  r[1] - patch_size[1] // 2:r[1] + patch_size[1] - patch_size[1] // 2,
-    #                  r[2] - patch_size[2] // 2:r[2] + patch_size[2] - patch_size[2] // 2,
-    #                  ] for r in zip(*rand_inds)]) for data in datas]
-    print(datas)
-    res = [
-            np.stack(
-                [
-                    data[
-                        tuple(
-                            slice(
-                                _r - (_p//2),
-                                _r + _p-(_p//2)
+    if (list_common_spots == None): # Traditional way of CSBDeep
+        res = [
+                np.stack(
+                    [
+                        data[
+                            tuple(
+                                slice(
+                                    _r - (_p//2),
+                                    _r + _p-(_p//2)
+                                )
+                                for _r,_p in zip(r, patch_size)
                             )
-                            for _r,_p in zip(r, patch_size)
+                         ] for r in zip(*rand_inds)
+                     ]
+                    ) for data in datas
+                ]
+    else: #SR way with list of common spots between frames
+        res = []
+        stackX = []
+        stackY = []
+        for commonSpot in list_common_spots:
+            distance = commonSpot[0]
+            spot1 = commonSpot[1]
+            spot2 = commonSpot[2]
+            frame1 = commonSpot[1][0]
+            frame2 = commonSpot[2][0]
+            index = datas[0].shape[1] * spot1[1] + spot1[2]
+
+            stackX.append(
+                datas[0][
+                    tuple(
+                        slice(
+                            _r - (_p//2),
+                            _r + _p-(_p//2)
                         )
-                        ] for r in zip(*rand_inds)
-                    ]
-                ) for data in datas
-            ]
+                        for _r,_p in zip((frame1, int(spot1[2]), int(spot1[1])), patch_size)
+                    )
+                ]
+            )
+
+            stackY.append(
+                datas[1][
+                    tuple(
+                        slice(
+                            _r - (_p//2),
+                            _r + _p-(_p//2)
+                        )
+                        for _r, _p in zip((frame2, int(spot2[2]), int(spot2[1])), patch_size)
+                    )
+                ]
+            )
+            if (len(stackX) == n_samples):
+                break;
+        res = [np.stack([x]) for x in [stackX, stackY]]
 
     return res
 

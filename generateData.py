@@ -89,7 +89,9 @@ def identifyDots(thresholdDistance, basepath, target_dir, source_dir, images_per
                         break
 
     print("number of couple points under threshold found : ", numberOfPointsUnderThreshold)
-    result_array = sorted(result_array, key=itemgetter(0))
+    result_array = sorted(result_array, key=lambda x: x[1][3], reverse=True)
+    for res in result_array:
+        print(res[1][3])
     return result_array
 
 
@@ -103,7 +105,7 @@ def generateData(basepath, source_dir, target_dir, n_patches_per_image, list_com
     data = RawData.from_folder(basepath=basepath, source_dirs=[source_dir], target_dir=target_dir, axes='ZYX')
     #print(data.size)
 
-    X, Y, XY_axes = createPatches(data, patch_size=(1, 64,128), n_patches_per_image=n_patches_per_image, verbose=True, list_common_spots=list_common_spots)
+    X, Y, XY_axes = createPatches(data, patch_size=(1, 16,16), n_patches_per_image=n_patches_per_image, verbose=True, list_common_spots=list_common_spots)
     #print(X, Y)
 
     print("shape of X,Y =", X.shape)
@@ -138,7 +140,6 @@ source_dir = "flou"
 
 thresholdDistance = 0.1 #in (sub)pixel
 n_patches_per_image = 800
-
 
 #localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
 
