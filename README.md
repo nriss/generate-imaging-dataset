@@ -1,12 +1,9 @@
-# DatasetMicroscopy
-
-######################
 # DATASET MICROSCOPY #
-######################
+
 
 Python script used to generate patches used by CSBDeep for super resolution microscopy.
 
-Create patches where common points have been found between multiple image stacks.
+Create patches where common spots have been found between multiple image stacks.
 
 Contains modified code of picasso (https://github.com/jungmannlab/picasso) for spot localization.
 Also contains modified patches creation function from CSBDeep (https://github.com/CSBDeep/CSBDeep).
