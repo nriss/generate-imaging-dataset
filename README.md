@@ -18,3 +18,17 @@ To work with DatasetMicroscopy :
 
 
 2) Run generateData.py (python generateData.py)
+
+
+
+Example of directory :
+1) net : 
+- pos1_1
+- pos1_2
+- pos2_1
+- pos2_2
+2) flou :
+- pos1_1
+- pos1_2
+- pos2_1
+- pos2_2
