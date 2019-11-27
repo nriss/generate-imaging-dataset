@@ -145,14 +145,19 @@ def locs_in_rectangle(locs, X, Y):
                                             _np.array(Y))
     return locs[is_in_rectangle]
 
-
+'''
+function minimize_shifts
+@param shifts_x
+@param shifts_y
+@param shifts_z (optional)
+'''
 def minimize_shifts(shifts_x, shifts_y, shifts_z=None):
     n_channels = shifts_x.shape[0]
     n_pairs = int(n_channels * (n_channels - 1) / 2)
     n_dims = 2 if shifts_z is None else 3
     rij = _np.zeros((n_pairs, n_dims))
-    A = _np.zeros((n_pairs, n_channels - 1))
-    flag = 0
+    # dirty correction
+    A = _np.zeros((n_pairs, n_channels - 1)) #ERROR : n_channels = 0 at the begining, impossible to create an array with negative bounds.
     for i in range(n_channels - 1):
         for j in range(i + 1, n_channels):
             rij[flag, 0] = shifts_y[i, j]

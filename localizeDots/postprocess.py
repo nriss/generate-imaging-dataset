@@ -9,6 +9,7 @@
 """
 
 import numpy as _np
+from numpy import fft as _fft
 
 from sklearn.cluster import DBSCAN as _DBSCAN
 from scipy import interpolate as _interpolate
@@ -21,12 +22,18 @@ import multiprocessing as _multiprocessing
 import matplotlib.pyplot as _plt
 import itertools as _itertools
 import lmfit as _lmfit
+from tqdm import tqdm as _tqdm
 from collections import OrderedDict as _OrderedDict
 import localizeDots.lib as _lib
 from threading import Thread as _Thread
 import time as _time
-from tqdm import tqdm as _tqdm
 from numpy.lib.recfunctions import stack_arrays
+
+
+
+
+
+
 
 
 def get_index_blocks(locs, info, size, callback=None):
@@ -1259,6 +1266,162 @@ def localization_precision(photons, s, bg, em):
     with _np.errstate(invalid="ignore"):
         return _np.sqrt(v)
 
+def undrift(
+    locs,
+    info,
+    segmentation,
+    display=True,
+    segmentation_callback=None,
+    rcc_callback=None,
+):
+    # Nicolas Riss : we are not interested in rendering !
+    bounds, segments = segment(
+        locs,
+        info,
+        segmentation,
+        {"blur_method": "gaussian", "min_blur_width": 1},
+        segmentation_callback,
+    )
+    shift_y, shift_x = rcc(segments, 32, rcc_callback)
+    t = (bounds[1:] + bounds[:-1]) / 2
+
+
+    drift_x_pol = _interpolate.InterpolatedUnivariateSpline(t, shift_x, k=3)
+    drift_y_pol = _interpolate.InterpolatedUnivariateSpline(t, shift_y, k=3)
+    
+    t_inter = _np.arange(info[0]["Frames"])
+    drift = (drift_x_pol(t_inter), drift_y_pol(t_inter))
+    drift = _np.rec.array(drift, dtype=[("x", "f"), ("y", "f")])
+
+    # Nicolas Riss : display commented
+    # if display:
+    #     fig1 = _plt.figure(figsize=(17, 6))
+    #     _plt.suptitle("Estimated drift")
+    #     _plt.subplot(1, 2, 1)
+    #     _plt.plot(drift.x, label="x interpolated")
+    #     _plt.plot(drift.y, label="y interpolated")
+    #     t = (bounds[1:] + bounds[:-1]) / 2
+    #     _plt.plot(
+    #         t,
+    #         shift_x,
+    #         "o",
+    #         color=list(_plt.rcParams["axes.prop_cycle"])[0]["color"],
+    #         label="x",
+    #     )
+    #     _plt.plot(
+    #         t,
+    #         shift_y,
+    #         "o",
+    #         color=list(_plt.rcParams["axes.prop_cycle"])[1]["color"],
+    #         label="y",
+    #     )
+    #     _plt.legend(loc="best")
+    #     _plt.xlabel("Frame")
+    #     _plt.ylabel("Drift (pixel)")
+    #     _plt.subplot(1, 2, 2)
+    #     _plt.plot(
+    #         drift.x,
+    #         drift.y,
+    #         color=list(_plt.rcParams["axes.prop_cycle"])[2]["color"],
+    #     )
+    #     _plt.plot(
+    #         shift_x,
+    #         shift_y,
+    #         "o",
+    #         color=list(_plt.rcParams["axes.prop_cycle"])[2]["color"],
+    #     )
+    #     _plt.axis("equal")
+    #     _plt.xlabel("x")
+    #     _plt.ylabel("y")
+    #     fig1.show()
+    locs.x -= drift.x[locs.frame]
+    locs.y -= drift.y[locs.frame]
+    return drift, locs
+#####################################
+### Functions from picasso render ###
+###    Imported by Nicolas Riss   ###
+#####################################
+
+
+
+#######################################
+#           Function segment          #
+# @param segmentation (default: 1000) #
+#######################################
+def segment(locs, info, segmentation, kwargs={}, callback=None):
+    Y = info[0]["Height"]
+    X = info[0]["Width"]
+    n_frames = info[0]["Frames"]
+    n_seg = n_segments(info, segmentation)
+    bounds = _np.linspace(0, n_frames - 1, n_seg + 1, dtype=_np.uint32)
+    segments = _np.zeros((n_seg, Y, X))
+    if callback is not None:
+        callback(0)
+    for i in range(n_seg):
+        segment_locs = locs[
+            (locs.frame >= bounds[i]) & (locs.frame < bounds[i + 1])
+        ]
+        (y_min, x_min), (y_max, x_max) = [(0, 0), (info[0]["Height"], info[0]["Width"])]
+        _, segments[i] = render_gaussian(segment_locs, 1, y_min, x_min, y_max, x_max, 1)#(segment_locs, info, **kwargs)
+        if callback is not None:
+            callback(i + 1)
+    return bounds, segments
+
+#######################################################
+#                function n_segments                  #
+# compute the number of number of frames per segments #
+# @param info: to know the frame numbers              #
+# @param segmentation: nb of segment (default: 1000)  #
+#######################################################
+def n_segments(info, segmentation):
+    n_frames = info[0]["Frames"]
+    ########################################################
+    # /!\ number of frames must be > segmentation (= 1000) #
+    ########################################################
+    if (n_frames < segmentation):
+        raise ValueError("Error: number of frames must be > segmentation (default=1000)")
+    print(int(_np.round(n_frames / segmentation)))
+    return int(_np.round(n_frames / segmentation))
+
+def render_gaussian(
+    locs, oversampling, y_min, x_min, y_max, x_max, min_blur_width
+):
+    image, n_pixel_y, n_pixel_x, x, y, in_view = _render_setup(
+        locs, oversampling, y_min, x_min, y_max, x_max
+    )
+    blur_width = oversampling * _np.maximum(locs.lpx, min_blur_width)
+    blur_height = oversampling * _np.maximum(locs.lpy, min_blur_width)
+    sy = blur_height[in_view]
+    sx = blur_width[in_view]
+    for x_, y_, sx_, sy_ in zip(x, y, sx, sy):
+        max_y = _DRAW_MAX_SIGMA * sy_
+        i_min = _np.int32(y_ - max_y)
+        if i_min < 0:
+            i_min = 0
+        i_max = _np.int32(y_ + max_y + 1)
+        if i_max > n_pixel_y:
+            i_max = n_pixel_y
+        max_x = _DRAW_MAX_SIGMA * sx_
+        j_min = _np.int32(x_ - max_x)
+        if j_min < 0:
+            j_min = 0
+        j_max = _np.int32(x_ + max_x) + 1
+        if j_max > n_pixel_x:
+            j_max = n_pixel_x
+        for i in range(i_min, i_max):
+            for j in range(j_min, j_max):
+                image[i, j] += _np.exp(
+                    -(
+                        (j - x_ + 0.5) ** 2 / (2 * sx_ ** 2)
+                        + (i - y_ + 0.5) ** 2 / (2 * sy_ ** 2)
+                    )
+                ) / (2 * _np.pi * sx_ * sy_)
+    return len(x), image
+
+########################################
+### End function from picasso render ###
+###     Imported by Nicolas Riss     ###
+########################################
 
 def align(locs, infos, display=False):
     images = []
@@ -1366,10 +1529,6 @@ def calculate_fret(acc_locs, don_locs):
     :author: Joerg Schnitzbauer, 2016
     :copyright: Copyright (c) 2016 Jungmann Lab, MPI of Biochemistry
 """
-import numpy as _np
-from numpy import fft as _fft
-import lmfit as _lmfit
-from tqdm import tqdm as _tqdm
 
 
 
@@ -1450,17 +1609,23 @@ def get_image_shift(imageA, imageB, box, roi=None, display=False):
 
 
 def rcc(segments, max_shift=None, callback=None):
+    print("there 0")
     n_segments = len(segments)
     shifts_x = _np.zeros((n_segments, n_segments))
     shifts_y = _np.zeros((n_segments, n_segments))
     n_pairs = int(n_segments * (n_segments - 1) / 2)
     flag = 0
+    print("number of segments : ", n_segments)
     for i in range(n_segments - 1):
         for j in range(i + 1, n_segments):
+            print("there 1.1")
             shifts_y[i, j], shifts_x[i, j] = get_image_shift(
                 segments[i], segments[j], 5, max_shift
             )
+            print("there 1.2")
             flag += 1
             if callback is not None:
                 callback(flag)
+            print("there 1.3")
+
     return _lib.minimize_shifts(shifts_x, shifts_y)

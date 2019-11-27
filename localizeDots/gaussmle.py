@@ -659,6 +659,7 @@ def locs_from_fits(
     y = theta[:, 0] + identifications.y - box_offset
     x = theta[:, 1] + identifications.x - box_offset
     with _np.errstate(invalid="ignore"):
+        print(CRLBs[:, 0])
         lpy = _np.sqrt(CRLBs[:, 0])
         lpx = _np.sqrt(CRLBs[:, 1])
         a = _np.maximum(theta[:, 4], theta[:, 5])

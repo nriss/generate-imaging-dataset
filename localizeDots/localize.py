@@ -20,6 +20,8 @@ from itertools import chain as _chain
 import matplotlib.pyplot as _plt
 import localizeDots.gaussmle as _gaussmle
 import localizeDots.ioLocalize as _io
+import localizeDots.postprocess as postprocess
+from localizeDots.ioLocalize import load_movie, save_locs, save_info, load_locs
 
 
 _C_FLOAT_POINTER = _ctypes.POINTER(_ctypes.c_float)
@@ -131,7 +133,6 @@ def identify_by_frame_number(movie, minimum_ng, box, frame_number, roi=None):
 
 
 def _identify_worker(movie, current, minimum_ng, box, roi, lock):
-    print("launched")
     n_frames = len(movie)
     identifications = []
     while True:
@@ -296,6 +297,14 @@ def locs_from_fits(
     box_offset = int(box / 2)
     y = theta[:, 0] + identifications.y - box_offset
     x = theta[:, 1] + identifications.x - box_offset
+    #with _np.errstate(invalid="ignore"):
+
+    # BEGINING modif
+    # Modified by Nicolas Riss because caused an error (trying to do sqrt on negative values) --> replacing negatives by 0
+    for i in range (len(CRLBs)):
+        CRLBs[i][CRLBs[i] < 0] = 0
+    # END modif
+
     lpy = _np.sqrt(CRLBs[:, 0])
     lpx = _np.sqrt(CRLBs[:, 1])
     locs = _np.rec.array(
@@ -342,7 +351,6 @@ import os.path
 
 def _undrift(files, segmentation, display=True, fromfile=None):
     import glob
-    import postprocess
     from numpy import genfromtxt, savetxt
 
     paths = glob.glob(files)
@@ -380,8 +388,6 @@ def _localize(args):
     from time import sleep
     import os.path as _ospath
     import re as _re
-    from localizeDots.ioLocalize import load_movie, save_locs, save_info
-    import localizeDots.ioLocalize as _io
     import os as _os
     import yaml as yaml
 
@@ -587,6 +593,7 @@ def _localize(args):
             out_path = base + "_locs.hdf5"
             save_locs(out_path, locs, info)
             print("File saved to {}".format(out_path))
+            print("drifting : ", args.drift)
             if args.drift > 0:
                 print("Undrifting file:")
                 print("------------------------------------------")
@@ -599,6 +606,10 @@ def _localize(args):
                     print("Drift correction failed for {}".format(out_path))
 
             print("                                          ")
+            # BEGINING modif
+            # Modified by Nicolas Riss to access to locs
+            return locs
+            # END modif
     else:
         print("Error. No files found.")
         raise FileNotFoundError
@@ -606,7 +617,7 @@ def _localize(args):
 
 def launchLocalize(file):
     import argparse
-    print(file)
+
     # Main parser
     parser = argparse.ArgumentParser("picasso")
 
@@ -647,7 +658,7 @@ def launchLocalize(file):
         "-s", "--sensitivity", type=float, default=1, help="camera sensitivity"
     )
     parser.add_argument(
-        "-ga", "--gain", type=int, default=1, help="camera gain"
+        "-ga", "--gain", type=int, default=1, help="camera gain" #TODO : test avec 400
     )
     parser.add_argument(
         "-qe", "--qe", type=float, default=1, help="camera quantum efficiency"
@@ -656,7 +667,7 @@ def launchLocalize(file):
     # Parse
     args = parser.parse_args()
     if args.files:
-        _localize(args)
+        return _localize(args)
     else:
         parser.print_help()
         print("--ERROR--")
