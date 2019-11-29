@@ -19,16 +19,8 @@ To work with DatasetMicroscopy :
 
 Example of directory
 ----------------------
-- data/target 
-file1.ome.tif
-file2.ome.tif
-file3.ome.tif
-file4.ome.tif
-- data/source
-file1.ome.tif
-file2.ome.tif
-file3.ome.tif
--> file4.ome.tif
+- data/target/{file1.ome.tif, file2.ome.tif, file3.ome.tif, file4.ome.tif}
+- data/source/{file1.ome.tif, file2.ome.tif, file3.ome.tif, file4.ome.tif}
 
 The files must have the same names between target and source directories
 
