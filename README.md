@@ -4,7 +4,7 @@
 Python script used to generate patches and create CSBDeep model applied to super resolution microscopy.
 1) Create patches where common spots have been found between image stack pairs.
 2) Build CSBDeep model
-3) Test CSBDeep model
+3) Test CSBDeep model on images
 
 
 Getting started
