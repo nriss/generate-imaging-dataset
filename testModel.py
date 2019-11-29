@@ -1,3 +1,10 @@
+##############
+# TEST MODEL #
+##############
+'''
+    Python script used to test the model after computing
+'''
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 import numpy as np
 import matplotlib.pyplot as plt

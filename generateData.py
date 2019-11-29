@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-np.set_printoptions(threshold=sys.maxsize) #writing entire data (not splitting) may consume time
+# uncomment ot write entire data (not splitting) may consume time
+#np.set_printoptions(threshold=sys.maxsize)
 
 ##############################
 # Localize spots and undrift #
@@ -176,7 +177,7 @@ def removeFrameAxe(X, Y, XY_axes):
 #############
 '''
     function show plot
-    show some example of X / Y patches
+    show examples of X / Y patches
 '''
 def showPlot(X, Y, XY_axes):
     from csbdeep.utils import plot_some
@@ -192,10 +193,19 @@ def showPlot(X, Y, XY_axes):
 ########
 
 # Parameters
+'''
+    @param basepath : folder containing target_dir and source_dirs
+    @param target_dir : target directory containing great quality images
+    @param source_dirs : source directory containing poor quality images
+    @param fileName_common_spot : filename where to save pairspots between image stacks
+    @param list_common_spots : list of pairspots (saved in fileName_common_spot file)
+    @param thresholdDistance : accepted distance between two spots of two images to consider them as the same spot
+    @param n_patches_per_image : number of patches wanted per tif stack
+'''
 basepath =  "data_ome_tif"
-target_dir = "net"
-source_dir = "flou"
-fileName_common_spot = "pairSpots.npy"
+target_dir = "target"
+source_dir = "source"
+fileName_common_spot = "pairSpots.npy" #save common spots to avoid
 list_common_spots = None
 #####################################
 # Threshold distance in (sub)pixels #
