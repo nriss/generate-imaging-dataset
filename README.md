@@ -5,8 +5,7 @@ Python script used to generate patches used by CSBDeep for super resolution micr
 
 Create patches where common spots have been found between multiple image stacks.
 
-Contains modified code of picasso (https://github.com/jungmannlab/picasso) for spot localization.
-Also contains modified patches creation function from CSBDeep (https://github.com/CSBDeep/CSBDeep).
+This tool uses modified code of picasso (https://github.com/jungmannlab/picasso) for spot localization and modified patches creation function from CSBDeep (https://github.com/CSBDeep/CSBDeep).
 
 
 Getting started
