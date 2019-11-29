@@ -32,5 +32,6 @@ This function will use the npz file and CSBDeep functions (cf CSBDeep getting st
 
 About
 -----
-Tools developed by Nicolas Riss under the supervison of Julien Godet.
 This tool uses modified code of picasso (https://github.com/jungmannlab/picasso) for spot localization and modified patches creation function from CSBDeep (https://github.com/CSBDeep/CSBDeep).
+
+Tools developed by Nicolas Riss under the supervison of Julien Godet.
