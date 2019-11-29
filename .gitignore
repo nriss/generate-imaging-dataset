@@ -3,6 +3,21 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+#saved files
+data_ome_tif/net/
+data_ome_tif/flou/
+data/
+test.npz
+pairSpots.txt
+data/*
+*.tif
+*.npy
+*.npz
+data/source/*
+data/target/*
+models*
+
 # C extensions
 *.so
 
