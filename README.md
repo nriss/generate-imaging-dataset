@@ -24,3 +24,7 @@ The files must have the same names between target and source directories
 
 
 2) Run generateData.py (python generateData.py)
+this script will create a npz file containing pair of image patch needed to build the model
+
+3) Run createModel.py (python createModel.py)
+This function will use the npz file and CSBDeep functions (cf CSBDeep getting started in https://github.com/CSBDeep/CSBDeep) to compute the CARE model.
