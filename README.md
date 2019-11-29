@@ -9,7 +9,7 @@ Create patches where common spots have been found between multiple image stacks.
 Getting started
 ---------------
 To work with DatasetMicroscopy :
-1) save your image files (*.tif*) in a data directory
+1) Save your image files (*.tif*) in a data directory
 - **target** for great quality images
 - **source** for poor quality images
 
