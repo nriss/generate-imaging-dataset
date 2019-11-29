@@ -202,7 +202,7 @@ def showPlot(X, Y, XY_axes):
     @param thresholdDistance : accepted distance between two spots of two images to consider them as the same spot
     @param n_patches_per_image : number of patches wanted per tif stack
 '''
-basepath =  "data_ome_tif"
+basepath =  "data"
 target_dir = "target"
 source_dir = "source"
 fileName_common_spot = "pairSpots.npy" #save common spots to avoid
