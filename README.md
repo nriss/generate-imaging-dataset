@@ -13,8 +13,8 @@ Getting started
 ---------------
 To work with DatasetMicroscopy :
 1) save your image files (*.tif*) in data_ome_tif  (Equivalent stack images must have the same names)
-- **net** for great quality images
-- **flou** for bad quality images
+- **target** for great quality images
+- **source** for bad quality images
 
 
 2) Run generateData.py (python generateData.py)
