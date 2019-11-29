@@ -5,18 +5,13 @@ __pycache__/
 
 
 #saved files
-data_ome_tif/net/
-data_ome_tif/flou/
-data/
-test.npz
 pairSpots.txt
-data/*
 *.tif
 *.npy
 *.npz
 data/source/*
 data/target/*
-models*
+models/*
 
 # C extensions
 *.so
