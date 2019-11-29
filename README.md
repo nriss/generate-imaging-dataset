@@ -19,7 +19,7 @@ Example of directory
 - data/target/{file1.ome.tif, file2.ome.tif, file3.ome.tif, file4.ome.tif}
 - data/source/{file1.ome.tif, file2.ome.tif, file3.ome.tif, file4.ome.tif}
 
-The files must have the same names between target and source directories
+The equivalent image stacks must have the same names between target and source directories
 
 
 2) Run generateData.py (python generateData.py)
