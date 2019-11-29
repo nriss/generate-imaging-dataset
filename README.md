@@ -1,7 +1,7 @@
 # DATASET MICROSCOPY #
 
 
-Python script used to generate patches used by CSBDeep for super resolution microscopy.
+Python script used to generate patches and create CSBDeep model applied to super resolution microscopy.
 
 Create patches where common spots have been found between multiple image stacks.
 
