@@ -20,12 +20,12 @@ To work with DatasetMicroscopy :
 2) Run generateData.py (python generateData.py)
 
 Example of directory :
-1) target : 
+1) data/target 
 - file1.ome.tif
 - file2.ome.tif
 - file3.ome.tif
 - file4.ome.tif
-2) source :
+2) data/source
 - file1.ome.tif
 - file2.ome.tif
 - file3.ome.tif
