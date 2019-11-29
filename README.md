@@ -12,13 +12,12 @@ Also contains modified patches creation function from CSBDeep (https://github.co
 Getting started
 ===============
 To work with DatasetMicroscopy :
-1) save your image files (*.tif*) in data_ome_tif  (Equivalent stack images must have the same names)
+1) save your image files (*.tif*) in a data directory
 - **target** for great quality images
 - **source** for poor quality images
 
 
 Example of directory
-----------------------
 - data/target/{file1.ome.tif, file2.ome.tif, file3.ome.tif, file4.ome.tif}
 - data/source/{file1.ome.tif, file2.ome.tif, file3.ome.tif, file4.ome.tif}
 
