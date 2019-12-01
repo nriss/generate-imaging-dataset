@@ -9,9 +9,10 @@ pairSpots.txt
 *.tif
 *.npy
 *.npz
-data/source/*
-data/target/*
+*.hdf5
+*.yaml
 models/*
+data/*
 
 # C extensions
 *.so
