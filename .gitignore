@@ -17,7 +17,7 @@ data/*
 # C extensions
 *.so
 
-@others
+#others
 data/
 data_ome_tif/
 

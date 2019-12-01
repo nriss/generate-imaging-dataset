@@ -259,17 +259,19 @@ thresholdDistance = 0.1
 # Number of patches for tif Files #
 ###################################
 n_patches_per_image = 1000
+
 patchSize = 32
 
 xDim = 512
 yDim = 256
-#localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
+localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
 
 list_common_spots = identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, n_patches_per_image)
-#
-# X, Y, XY_axes = generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, list_common_spots, fileName_common_spot)
-# X, Y, XY_axes = removeFrameAxe(X, Y, XY_axes, patchSize)
-#
-# saveData(X, Y, XY_axes)
-#
-# showPlot(X, Y, XY_axes)
+
+X, Y, XY_axes = generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, list_common_spots, fileName_common_spot)
+X, Y, XY_axes = removeFrameAxe(X, Y, XY_axes, patchSize)
+
+saveData(X, Y, XY_axes)
+
+showPlot(X, Y, XY_axes)
+
