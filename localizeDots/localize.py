@@ -382,6 +382,7 @@ def _undrift(files, segmentation, display=True, fromfile=None):
 
 
 def _localize(args):
+    result = []
     from glob import glob
 
     from os.path import splitext, isdir
@@ -417,38 +418,40 @@ def _localize(args):
         )
     print("------------------------------------------")
 
-    def check_consecutive_tif(filepath):
-        """
-        Function to only return the first file of a consecutive ome.tif series
-        to not reconstruct all of them as load_movie automatically detects
-        consecutive files. E.g. have a folder with file.ome.tif,
-        file_1.ome.tif, file_2.ome.tif, will return only file.ome.tif
-        """
-        files = glob(filepath + "/*.tif")
-        newlist = [os.path.abspath(file) for file in files]
-        for file in files:
-            path = os.path.abspath(file)
-            directory = os.path.dirname(path)
-            base, ext = os.path.splitext(
-                os.path.splitext(path)[0]
-            )  # split two extensions as in .ome.tif
-            base = _re.escape(base)
-            pattern = _re.compile(
-                base + r"_(\d*).ome.tif"
-            )  # This matches the basename + an appendix of the file number
-            entries = [_.path for _ in os.scandir(directory) if _.is_file()]
-            matches = [_re.match(pattern, _) for _ in entries]
-            matches = [_ for _ in matches if _ is not None]
-            datafiles = [_.group(0) for _ in matches]
-            if datafiles != []:
-                for element in datafiles:
-                    newlist.remove(element)
-        return newlist
+    # def check_consecutive_tif(filepath):
+    #     """
+    #     Function to only return the first file of a consecutive ome.tif series
+    #     to not reconstruct all of them as load_movie automatically detects
+    #     consecutive files. E.g. have a folder with file.ome.tif,
+    #     file_1.ome.tif, file_2.ome.tif, will return only file.ome.tif
+    #     """
+    #     files = glob(filepath + "/*.tif")
+    #     newlist = [os.path.abspath(file) for file in files]
+    #     for file in files:
+    #         path = os.path.abspath(file)
+    #         directory = os.path.dirname(path)
+    #         base, ext = os.path.splitext(
+    #             os.path.splitext(path)[0]
+    #         )  # split two extensions as in .ome.tif
+    #         base = _re.escape(base)
+    #         pattern = _re.compile(
+    #             base + r"_(\d*).ome.tif"
+    #         )  # This matches the basename + an appendix of the file number
+    #         entries = [_.path for _ in os.scandir(directory) if _.is_file()]
+    #         matches = [_re.match(pattern, _) for _ in entries]
+    #         matches = [_ for _ in matches if _ is not None]
+    #         datafiles = [_.group(0) for _ in matches]
+    #         if datafiles != []:
+    #             for element in datafiles:
+    #                 newlist.remove(element)
+    #     return newlist
 
     if os.path.isdir(files):
         print("Analyzing folder")
 
-        tif_files = check_consecutive_tif(files)
+        f = glob(files + "/*.tif")
+        tif_files = [os.path.abspath(file) for file in f]
+        #tif_files = check_consecutive_tif(files)
 
         paths = tif_files + glob(files + "/*.raw")
         print("A total of {} files detected".format(len(paths)))
@@ -608,11 +611,12 @@ def _localize(args):
             print("                                          ")
             # BEGINING modif
             # Modified by Nicolas Riss to access to locs
-            return locs
+            result.append(locs)
             # END modif
     else:
         print("Error. No files found.")
         raise FileNotFoundError
+    return result
 
 
 def launchLocalize(file):

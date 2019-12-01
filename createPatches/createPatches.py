@@ -65,7 +65,6 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
                     ) for data in datas
                 ]
     else: #SR way with list of common spots between frames
-        res = []
         stackX = []
         stackY = []
         for commonSpot in list_common_spots:
@@ -74,7 +73,6 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
             spot2 = commonSpot[2]
             frame1 = commonSpot[1][0]
             frame2 = commonSpot[2][0]
-            index = datas[0].shape[1] * spot1[1] + spot1[2]
 
             stackX.append(
                 datas[0][
@@ -101,6 +99,7 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
             )
             if (len(stackX) == n_samples):
                 break;
+
         res = [np.stack([x]) for x in [stackX, stackY]]
 
     return res
@@ -400,7 +399,7 @@ def createPatches(
         (channel is None or (isinstance(channel,int) and 0<=channel<x.ndim)) or _raise(ValueError())
         channel is None or patch_size[channel]==x.shape[channel] or _raise(ValueError('extracted patches must contain all channels.'))
 
-        _Y,_X = sample_patches_from_multiple_stacks((y,x), patch_size, n_patches_per_image, mask, patch_filter, list_common_spots)
+        _Y,_X = sample_patches_from_multiple_stacks((y,x), patch_size, n_patches_per_image, mask, patch_filter, list_common_spots[i])
 
         s = slice(i*n_patches_per_image,(i+1) * n_patches_per_image)
         X[s], Y[s] = normalization(_X,_Y, x,y,mask,channel)
