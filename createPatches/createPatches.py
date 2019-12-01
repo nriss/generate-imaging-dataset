@@ -48,7 +48,7 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
 
     rand_inds = [v[sample_inds] for v in valid_inds]
 
-    if (list_common_spots == None): # Traditional way of CSBDeep
+    if (list_common_spots is None): # Traditional way of CSBDeep
         res = [
                 np.stack(
                     [

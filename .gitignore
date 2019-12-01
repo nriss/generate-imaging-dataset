@@ -3,6 +3,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+#saved files
+pairSpots.txt
+*.tif
+*.npy
+*.npz
+data/source/*
+data/target/*
+models/*
+
 # C extensions
 *.so
 
