@@ -662,7 +662,7 @@ def launchLocalize(file):
         "-s", "--sensitivity", type=float, default=1, help="camera sensitivity"
     )
     parser.add_argument(
-        "-ga", "--gain", type=int, default=1, help="camera gain" #TODO : test avec 400
+        "-ga", "--gain", type=int, default=400, help="camera gain" #TODO : test avec 400
     )
     parser.add_argument(
         "-qe", "--qe", type=float, default=1, help="camera quantum efficiency"

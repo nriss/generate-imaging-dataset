@@ -40,6 +40,7 @@ def localizeSpots(path_X, path_Y):
     @param image_per_patches : number of images we want per patches (for perf optimization, we are looking for 10 * image_per_patches pairs of dots here).
     @param pathCommonSpots : filename to save common spot
 '''
+
 def identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, images_per_patches, pathCommonSpots):
     from itertools import chain
     import h5py, math
@@ -266,9 +267,9 @@ patchSize = 8
 
 xDim = 512
 yDim = 256
-localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
+#localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
 
-list_common_spots = identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, n_patches_per_image)
+list_common_spots = identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, n_patches_per_image, pathCommonSpots)
 
 X, Y, XY_axes = generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, list_common_spots, fileName_common_spot)
 
