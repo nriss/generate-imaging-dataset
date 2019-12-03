@@ -246,7 +246,7 @@ def showPlot(X, Y, XY_axes):
     @param n_patches_per_image : number of patches wanted per tif stack
     @param spotSize : patchSize in pixel
 '''
-basepath =  "data_20"
+basepath =  "data"
 target_dir = "target"
 source_dir = "source"
 dict_common_spots = None
