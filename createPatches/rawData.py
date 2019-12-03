@@ -82,6 +82,7 @@ class RawData(namedtuple('RawData' ,('generator' ,'size' ,'description'))):
         """
         p = Path(basepath)
         pairs = [(f, p/target_dir/f.name) for f in chain(*((p/source_dir).glob(pattern) for source_dir in source_dirs))]
+
         len(pairs) > 0 or _raise(FileNotFoundError("Didn't find any images."))
         consume(t.exists() or _raise(FileNotFoundError(t)) for s,t in pairs)
         axes = axes_check_and_normalize(axes)
@@ -91,9 +92,10 @@ class RawData(namedtuple('RawData' ,('generator' ,'size' ,'description'))):
 
         def _gen():
             for fx, fy in pairs:
+                print("pair name in rawdata: ", fx, fy)
                 x, y = imread(str(fx)), imread(str(fy))
                 len(axes) >= x.ndim or _raise(ValueError())
-                yield x, y, axes[-x.ndim:], None
+                yield x, y, axes[-x.ndim:], None, fx, fy
 
         return RawData(_gen, n_images, description)
 

@@ -38,22 +38,22 @@ def localizeSpots(path_X, path_Y):
     @param target_dir : folder containing the target images
     @param source_dir : fonder containing the source images
     @param image_per_patches : number of images we want per patches (for perf optimization, we are looking for 10 * image_per_patches pairs of dots here).
-    @param fileName_common_spot : filename to save common spot
+    @param pathCommonSpots : filename to save common spot
 '''
-def identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, images_per_patches):
+def identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, images_per_patches, pathCommonSpots):
     from itertools import chain
     import h5py, math
     from operator import itemgetter
     import math, random
 
-    print("identification of spots")
-    #TODO : data from identifySpots can be loaded in generateData if already computed
+    print("Common spots identification")
 
     try:
         from pathlib import Path
         Path().expanduser()
     except (ImportError,AttributeError):
         from pathlib2 import Path
+
     p = Path(basepath)
     pattern = '*.hdf5'
     pairs = [(f, p/target_dir/f.name) for f in chain(*((p/sd).glob(pattern) for sd in [source_dir]))]
@@ -61,32 +61,42 @@ def identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir
     pairNumber = 0
 
     numberOfPointsUnderThreshold = 0
-    result_array = []
+    result_array = {}
     for fx, fy in pairs: #fx and fy are path to files x and y
+        print(fx, fy)
         pairNumber = pairNumber + 1
         print("------------------------------------------")
-        print("--- Processing pair {} of {}".format(pairNumber, len(pairs)))
+        print("--------- Processing pair {} of {}".format(pairNumber, len(pairs)), "---------")
         print("------------------------------------------")
+        print()
 
         pairSet = []
         numberFound = 0
         with h5py.File(fx, 'r') as f:
             with h5py.File(fy, 'r') as g:
-                print("charging 1")
+                print("1) Charging localization files")
                 dataX = list(f['locs']) #taking so much time...
-                print("charging 2")
                 dataY = list(g['locs']) #taking so much time...
                 #################################
                 # Prends du temps le random.... #
                 #################################
-                print("randomizing")
+                print("2) randomizing X images")
                 dataX = sorted(dataX, key=lambda k: random.random()) # spot localization on X images
-                #dataY = sorted(dataY, key=lambda k: random.random()) # spot localization on Y images
+
+                print("3) Looking for common spots")
                 indent = 0
                 for dX in dataX:
-                    print("Percentage done: {}%, pair number: {}".format(math.trunc(indent*100/len(dataX)), len(pairSet)), end = '')
+                    Xposx = dX[1] # x position in image X
+                    Xposy = dX[2]
                     indent+=1
-                    for dY in dataY:
+                    ### Testing if we are not on the border of the image (will be deleted if we select dots everywhere on the screen)
+                    if ((Xposx - thresholdDistance < (patchSize / 2)) or (Xposx + thresholdDistance > xDim - (patchSize / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
+                        continue;
+                    print("Percentage done: {}%, pair number: {}".format(math.trunc(indent*100/len(dataX)), len(pairSet)), end = '\r')
+                    xVal = [Xposx < b[1] + thresholdDistance and Xposx > b[1] - thresholdDistance for b in dataY]
+                    for index, dY in enumerate(dataY):
+                        if (not xVal[index]):
+                            continue
                         ####################
                         # dX and dY Format #
                         ####################
@@ -109,53 +119,44 @@ def identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir
                         14(optional): n
                         15(optional): photon_rate
                         '''
-                        Xposx = dX[1] # x position in image X
-                        Xposy = dX[2]
                         Yposx = dY[1]
                         Yposy = dY[2]
-                        if (Yposx > Xposx):
-                            break;
+
+                        if (Yposy > Xposy + thresholdDistance or Yposy < Xposy - thresholdDistance):
+                            # print("break")
+                            continue
                         dist = math.sqrt( (Xposx - Yposx) ** 2 + (Xposy - Yposy) ** 2 )
-                        if (dist < thresholdDistance):
-                            if (Xposx - thresholdDistance > (patchSize / 2) and Xposx + thresholdDistance < xDim - (patchSize / 2)):
-                                if (Xposy - thresholdDistance > (patchSize / 2) and Xposy + thresholdDistance < yDim - (patchSize / 2)):
-                                    array = np.append(dX, dY)
-                                    array = np.array([dist, array], dtype=object)
-                                    numberOfPointsUnderThreshold += 1
-                                    pairSet.append([dist, dX, dY])
-                                    #print(dist, dX, dY)
-                                    numberFound +=1
+                        if (dist < thresholdDistance): # Pair found !
+                            array = np.array([dist, np.append(dX, dY)], dtype=object)
+                            numberOfPointsUnderThreshold += 1
+                            pairSet.append([dist, dX, dY])
+                            #print("pair found : ", dist, dX, dY)
+                            numberFound +=1
                             #TODO : look if there are other spots nearby
-                    if (numberFound > 10 * images_per_patches): # we limit at ten times the number of spots we look at for computation optimization
-                        #TODO: function to save the spots
+                            break;
+                    if (numberFound >= 4 * images_per_patches): # we limit at ten times the number of spots we look at for computation optimization
+                        print("Percentage done: {}%, pair number: {}".format(math.trunc(indent*100/len(dataX)), len(pairSet)), end = '\r')
+                        print()
+                        print("4) Ordering common spots per interest")
+                        name = fx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '')
+                        print("name for dict : ", name)
+                        pairSet = sorted(pairSet, key=lambda x: (x[2][3] + x[1][3]), reverse=True) #order by pixel intensity
+                        #pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
+
+                        result_array[name] = pairSet
+                        print()
                         break
 
-        ####################
-        ### SAVING SPOTs ###
-        ####################
-        import csv
 
-        np.save(fx.replace(".hdf5", "_pairSpots.npy").replace(target_dir, "").replace(source_dir, ""), np.asarray(result_array)) #can be improved ?
-
-        pairSet = sorted(pairSet, key=lambda x: random.random())
-        result_array.append(pairSet)
+    ####################
+    ### SAVING SPOTs ###
+    ####################
+    import csv
+    path = fx.absolute().as_posix()
+    np.save(pathCommonSpots, np.asarray(result_array)) #can be improved ?
 
     print("number of couple points under threshold found : ", numberOfPointsUnderThreshold)
-    #result_array = sorted(result_array, key=lambda x: x[1][3], reverse=True) #order by pixel intensity
-
-
-    # for i, e in enumerate(result_array):
-    #     print(e[2])
-    # #print(result_array)
-
-    #numberOfPointsUnderThreshold = random.shuffle(numberOfPointsUnderThreshold)
-
-    #
-    # with open("test.txt", "w") as txt_file:
-    #     for line in result_array:
-    #         txt_file.write(" ".join(str(line)) + "\n") # works with any number of elements in a line
-    # contains list of [distance, [spot 1], [spot 2]]
-
+    print("result array len : ", len(result_array))
     return result_array
 
 
@@ -169,15 +170,15 @@ def identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir
     @param target_dir : folder containing the target images
     @param source_dir : fonder containing the source images
     @param n_patches_per_image : number of patches per tif file.
-    @param list_common_spots : list of common spots obtained from localizeSpots function
-    @param fileName_common_spot : filename to load common spot
+    @param dict_common_spots : list of common spots obtained from localizeSpots function
+    @param pathCommonSpots : filename to load common spot
 '''
-def generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, list_common_spots=None, fileName_common_spot=None):
+def generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, dict_common_spots=None, pathCommonSpots=None):
 
-    if (list_common_spots == None and fileName_common_spot == None):
+    if (dict_common_spots == None and pathCommonSpots == None):
         print('/!\\ list_common_spot or fileName_common_spot is not defined in generateData, the pairSpots won\'t be taken into acccount')
-    elif (list_common_spots == None):
-        list_common_spots = np.load(fileName_common_spot, allow_pickle=True)
+    elif (dict_common_spots == None):
+        dict_common_spots = np.load(pathCommonSpots, allow_pickle=True)
 
     from csbdeep.io import save_training_data
     from csbdeep.data.generate import no_background_patches
@@ -185,7 +186,7 @@ def generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSiz
     from createPatches.rawData import RawData
     data = RawData.from_folder(basepath=basepath, source_dirs=[source_dir], target_dir=target_dir)
 
-    X, Y, XY_axes = createPatches(data, patch_size=(1, patchSize, patchSize), n_patches_per_image=n_patches_per_image, verbose=True, list_common_spots=list_common_spots)#, patch_axes="YX")
+    X, Y, XY_axes = createPatches(data, patch_size=(1, patchSize, patchSize), n_patches_per_image=n_patches_per_image, verbose=True, dict_common_spots=dict_common_spots)#, patch_axes="YX")
     print("shape of X,Y =", X.shape)
     print("axes  of X,Y =", XY_axes)
 
@@ -224,7 +225,7 @@ def removeFrameAxe(X, Y, XY_axes, patchSize):
 '''
 def showPlot(X, Y, XY_axes):
     from csbdeep.utils import plot_some
-    for i in range(2):
+    for i in range(3):
         plt.figure(figsize=(8,4))
         sl = slice(8*i, 8*(i+1)), 0
         plot_some(X[sl], Y[sl], title_list=[np.arange(sl[0].start,sl[0].stop)])
@@ -240,36 +241,39 @@ def showPlot(X, Y, XY_axes):
     @param basepath : folder containing target_dir and source_dirs
     @param target_dir : target directory containing great quality images
     @param source_dirs : source directory containing poor quality images
-    @param list_common_spots : list of pairspots (saved in fileName_common_spot file)
+    @param dict_common_spots : list of pairspots (saved in fileName_common_spot file)
     @param thresholdDistance : accepted distance between two spots of two images to consider them as the same spot
     @param n_patches_per_image : number of patches wanted per tif stack
     @param spotSize : patchSize in pixel
 '''
-basepath =  "data"
+basepath =  "data_20"
 target_dir = "target"
 source_dir = "source"
-list_common_spots = None
+dict_common_spots = None
+pathCommonSpots = basepath + "/commonSpots.npy"
 #####################################
 # Threshold distance in (sub)pixels #
 # to consider two spots as the same #
 #####################################
-thresholdDistance = 0.1
+thresholdDistance = 0.1 #0.1 is great
 
 ###################################
 # Number of patches for tif Files #
 ###################################
-n_patches_per_image = 1000
-patchSize = 32
+n_patches_per_image = 10
+patchSize = 8
 
 xDim = 512
 yDim = 256
-#localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
 
-list_common_spots = identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, n_patches_per_image)
-#
-# X, Y, XY_axes = generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, list_common_spots, fileName_common_spot)
-# X, Y, XY_axes = removeFrameAxe(X, Y, XY_axes, patchSize)
-#
-# saveData(X, Y, XY_axes)
-#
-# showPlot(X, Y, XY_axes)
+
+localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
+
+dict_common_spots = identifySpots(thresholdDistance, patchSize, xDim, yDim, basepath, target_dir, source_dir, n_patches_per_image, pathCommonSpots)
+
+X, Y, XY_axes = generateData(basepath, target_dir, source_dir, n_patches_per_image, patchSize, dict_common_spots, pathCommonSpots)
+X, Y, XY_axes = removeFrameAxe(X, Y, XY_axes, patchSize)
+
+saveData(X, Y, XY_axes)
+
+showPlot(X, Y, XY_axes)

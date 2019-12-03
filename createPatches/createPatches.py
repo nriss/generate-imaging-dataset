@@ -7,9 +7,9 @@ import sys, os, warnings
 from tqdm import tqdm
 
 
-#((y,x), patch_size, n_patches_per_image, mask, patch_filter, list_common_spots)
+#((y,x), patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots)
 
-def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask=None, patch_filter=None, list_common_spots = None, verbose=False):
+def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask=None, patch_filter=None, common_spots = None, verbose=False):
     """ sample matching patches of size `patch_size` from all arrays in `datas` """
     # TODO: some of these checks are already required in 'create_patches'
     len(patch_size)==datas[0].ndim or _raise(ValueError())
@@ -42,13 +42,13 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
         raise ValueError("'patch_filter' didn't return any region to sample from")
 
     valid_inds = [v + s.start for s, v in zip(border_slices, valid_inds)]
-
+    print("datas0 : ", len(datas[0]), "datas1 : ", len(datas[1]))
     # sample
     sample_inds = np.random.choice(len(valid_inds[0]), n_samples, replace=len(valid_inds[0])<n_samples)
 
     rand_inds = [v[sample_inds] for v in valid_inds]
 
-    if (list_common_spots is None): # Traditional way of CSBDeep
+    if (common_spots is None): # Traditional way of CSBDeep
         res = [
                 np.stack(
                     [
@@ -67,13 +67,13 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
     else: #SR way with list of common spots between frames
         stackX = []
         stackY = []
-        for commonSpot in list_common_spots:
-            distance = commonSpot[0]
+        for commonSpot in common_spots:
+            #distance = commonSpot[0]
             spot1 = commonSpot[1]
             spot2 = commonSpot[2]
             frame1 = commonSpot[1][0]
             frame2 = commonSpot[2][0]
-
+            print(frame1, int(spot1[2]), int(spot1[1]), "----", frame2, int(spot2[2]), int(spot2[1]))
             stackX.append(
                 datas[0][
                     tuple(
@@ -81,7 +81,7 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
                             _r - (_p//2),
                             _r + _p-(_p//2)
                         )
-                        for _r,_p in zip((frame1, int(spot1[2]), int(spot1[1])), patch_size)
+                        for _r,_p in zip((int(frame1), int(round(spot1[2])), int(round(spot1[1]))), patch_size)
                     )
                 ]
             )
@@ -93,7 +93,7 @@ def sample_patches_from_multiple_stacks(datas, patch_size, n_samples, datas_mask
                             _r - (_p//2),
                             _r + _p-(_p//2)
                         )
-                        for _r, _p in zip((frame2, int(spot2[2]), int(spot2[1])), patch_size)
+                        for _r, _p in zip((int(frame2), int(round(spot2[2])), int(round(spot2[1]))), patch_size)
                     )
                 ]
             )
@@ -273,7 +273,7 @@ def createPatches(
         raw_data,
         patch_size,
         n_patches_per_image,
-        list_common_spots = None,
+        dict_common_spots = None,
         patch_axes    = None,
         save_file     = None,
         transforms    = None,
@@ -384,7 +384,8 @@ def createPatches(
     X = np.empty((n_patches,)+tuple(patch_size),dtype=np.float32)
     Y = np.empty_like(X)
 
-    for i, (x,y,_axes,mask) in tqdm(enumerate(image_pairs),total=n_images,disable=(not verbose)):
+    for i, (x,y,_axes,mask, pathx, pathy) in tqdm(enumerate(image_pairs),total=n_images,disable=(not verbose)):
+        print("spotname : ", pathx.absolute().as_posix().split('/')[-1].replace('.tif', ''))
         if i >= n_images:
             warnings.warn('more raw images (or transformations thereof) than expected, skipping excess images.')
             break
@@ -399,7 +400,7 @@ def createPatches(
         (channel is None or (isinstance(channel,int) and 0<=channel<x.ndim)) or _raise(ValueError())
         channel is None or patch_size[channel]==x.shape[channel] or _raise(ValueError('extracted patches must contain all channels.'))
 
-        _Y,_X = sample_patches_from_multiple_stacks((y,x), patch_size, n_patches_per_image, mask, patch_filter, list_common_spots[i])
+        _Y,_X = sample_patches_from_multiple_stacks((y,x), patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots[pathx.absolute().as_posix().split('/')[-1].replace('.tif', '')])
 
         s = slice(i*n_patches_per_image,(i+1) * n_patches_per_image)
         X[s], Y[s] = normalization(_X,_Y, x,y,mask,channel)

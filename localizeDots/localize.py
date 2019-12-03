@@ -646,7 +646,7 @@ def launchLocalize(file):
         default="mle",
     )
     parser.add_argument(
-        "-g", "--gradient", type=int, default=5000, help="minimum net gradient"
+        "-g", "--gradient", type=int, default=8000, help="minimum net gradient"
     )
     parser.add_argument(
         "-d",
