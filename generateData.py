@@ -301,7 +301,7 @@ config['parameters']['thresholdDistance'] = '0.5' #Threshold distance to conside
 ###################################
 # Number of patches for tif Files #
 ###################################
-config['parameters']['n_patches_per_image'] = '100" #number of patches extracted by image stack
+config['parameters']['n_patches_per_image'] = '100' #number of patches extracted by image stack
 config['parameters']['patchSize'] = '8' #in px
 
 # gradient parameter for localization.
