@@ -296,12 +296,12 @@ config['parameters'] = {}
 # Threshold distance in (sub)pixels #
 # to consider two spots as the same #
 #####################################
-config['parameters']['thresholdDistance'] = '1' #Threshold distance to consider two spots as the same (0.1 is great)
+config['parameters']['thresholdDistance'] = '0.5' #Threshold distance to consider two spots as the same (0.1 is great)
 
 ###################################
 # Number of patches for tif Files #
 ###################################
-config['parameters']['n_patches_per_image'] = '10' #number of patches extracted by image stack
+config['parameters']['n_patches_per_image'] = '100" #number of patches extracted by image stack
 config['parameters']['patchSize'] = '8' #in px
 
 # gradient parameter for localization.
