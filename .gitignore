@@ -13,6 +13,7 @@ pairSpots.txt
 *.yaml
 models/*
 data/*
+data*
 
 # C extensions
 *.so

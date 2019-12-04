@@ -286,7 +286,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_20',
+config['path'] = {'basepath': 'data_shifted_100',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"
@@ -326,7 +326,7 @@ list_common_spots = None
 ######################################
 # 1) localization of spots (picasso) #
 ######################################
-#localizeSpots(config)
+localizeSpots(config)
 
 ############################################################
 # 2) identification of common spots between the two stacks #
