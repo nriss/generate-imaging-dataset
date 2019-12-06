@@ -292,8 +292,9 @@ def fit_async(
 
 
 def locs_from_fits(
-    identifications, theta, CRLBs, likelihoods, iterations, box
+    identifications, theta, CRLBs, likelihoods, iterations, box, config=None
 ):
+
     box_offset = int(box / 2)
     y = theta[:, 0] + identifications.y - box_offset
     x = theta[:, 1] + identifications.x - box_offset
@@ -307,6 +308,7 @@ def locs_from_fits(
 
     lpy = _np.sqrt(CRLBs[:, 0])
     lpx = _np.sqrt(CRLBs[:, 1])
+    #for index, value in identifications.frame:
     locs = _np.rec.array(
         (
             identifications.frame,
@@ -324,6 +326,10 @@ def locs_from_fits(
         ),
         dtype=LOCS_DTYPE,
     )
+    if config != None:
+        locs = locs[ (locs['lpx'] < float(config['parameters']['thresholdPrecision']) ) ]
+        locs = locs[ (locs['lpy'] < float(config['parameters']['thresholdPrecision']) ) ]
+    print("Conserving {} spots under localization precision threshold".format(len(locs)))#, len(locs[locs['lpx'] < ]))
     locs.sort(kind="mergesort", order="frame")
     return locs
 
@@ -381,7 +387,7 @@ def _undrift(files, segmentation, display=True, fromfile=None):
 
 
 
-def _localize(args):
+def _localize(args, config):
     result = []
     from glob import glob
 
@@ -558,7 +564,7 @@ def _localize(args):
                     sleep(0.2)
                 print("Fitting spot {:,} of {:,}".format(n_spots, n_spots))
                 locs = locs_from_fits(
-                    ids, thetas, CRLBs, likelihoods, iterations, box
+                    ids, thetas, CRLBs, likelihoods, iterations, box, config
                 )
 
             elif args.fit_method == "avg":
@@ -671,7 +677,7 @@ def launchLocalize(file, config):
     # Parse
     args = parser.parse_args()
     if args.files:
-        return _localize(args)
+        return _localize(args, config)
     else:
         parser.print_help()
         print("--ERROR--")

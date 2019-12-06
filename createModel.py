@@ -15,12 +15,9 @@ from csbdeep.models import Config, CARE
 # TRAINING DATA #
 #################
 
-download_and_extract_zip_file (
-    url       = 'http://csbdeep.bioimagecomputing.com/example_data/synthetic_disks.zip',
-    targetdir = 'data',
-)
+filename = "data_20"
 #10% of validation data are used there.
-(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
+(X_train,Y_train), (X_val,Y_val), axes = load_training_data(filename + '/patches.npz', validation_split=0.1, verbose=True)
 #(X_train, Y_train), (X_val,Y_val), axes = load_training_data('data/synthetic_disks/data.npz', validation_split=0.1, verbose=True)
 
 print("axes : ", axes)
@@ -39,7 +36,6 @@ plt.suptitle('5 example validation patches (top row: source, bottom row: target)
 
 # Config object contains: parameters of the underlying neural network, learning rate, number of parameter updates per epoch, loss function, and whether the model is probabilistic or not.
 #epoch can be increased considerably for a well-train model (ex: 400)
-print(axes)
 config = Config(axes, n_channel_in, n_channel_out, probabilistic=True, train_steps_per_epoch=30)
 print(config)
 vars(config)
@@ -50,16 +46,17 @@ vars(config)
 #Possibility to monitor the progress using TensorBoat (see https://www.tensorflow.org/guide/summaries_and_tensorboard)
 
 # model instanciation
-model = CARE(config=None, name='my_model', basedir='models')
-#model = CARE(config, 'my_model', basedir='models')
+#model = CARE(config=None, name='my_model', basedir='models')
+model = CARE(config, 'my_model', basedir='models')
+
 # training model
-#history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
+history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
 
 plt.figure(figsize=(12,10))
-_P = model.keras_model.predict(X_val[3:8])
+_P = model.keras_model.predict(X_val[:5])
 _P_mean  = _P[...,:(_P.shape[-1]//2)]
 _P_scale = _P[...,(_P.shape[-1]//2):]
-plot_some(X_val[3:8],Y_val[3:8],_P_mean,_P_scale,pmax=99.5)
+plot_some(X_val[:5],Y_val[:5],_P_mean,_P_scale,pmax=99.5)
 plt.suptitle('5 example validation patches\n'
              'first row: input (source),  '
              'second row: target (ground truth),  '

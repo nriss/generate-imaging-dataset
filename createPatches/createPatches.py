@@ -42,7 +42,7 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
         raise ValueError("'patch_filter' didn't return any region to sample from")
 
     valid_inds = [v + s.start for s, v in zip(border_slices, valid_inds)]
-    print("datas0 : ", len(datas[0]), "datas1 : ", len(datas[1]))
+
     # sample
     sample_inds = np.random.choice(len(valid_inds[0]), n_samples, replace=len(valid_inds[0])<n_samples)
 
@@ -65,8 +65,8 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
                     ) for data in datas
                 ]
     else: #SR way with list of common spots between frames
-        stackX = []
-        stackY = []
+        stackX = [] # source
+        stackY = [] #target
         for commonSpot in common_spots:
             #distance = commonSpot[0]
             spot1 = commonSpot[1]
@@ -75,55 +75,43 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
             frame2 = commonSpot[2][0]
 
             if (config['parameters']['centralSpot'] == '1'):
-                ## Centering the dot
-                stackX.append(
-                    datas[0][
-                        tuple(
-                            slice(
-                                _r - (_p//2),
-                                _r + _p-(_p//2)
-                            )
-                            for _r,_p in zip((int(frame1), int(round(spot1[2])), int(round(spot1[1]))), patch_size)
-                        )
-                    ]
-                )
+                valueX = [datas[1][frame1,
+                                 int(spot1[2]) - patch_size[2] // 2:int(spot1[2]) + patch_size[2] - patch_size[2] // 2,
+                                 int(spot1[1]) - patch_size[1] // 2:int(spot1[1]) + patch_size[1] - patch_size[1] // 2,
+                                 ]]
+                valueY = [datas[0][frame2,
+                                 int(spot1[2]) - patch_size[2] // 2:int(spot1[2]) + patch_size[2] - patch_size[2] // 2,
+                                 int(spot1[1]) - patch_size[1] // 2:int(spot1[1]) + patch_size[1] - patch_size[1] // 2,
+                                 ]]
 
-                stackY.append(
-                    datas[1][
-                        tuple(
-                            slice(
-                                _r - (_p//2),
-                                _r + _p-(_p//2)
-                            )
-                            for _r, _p in zip((int(frame2), int(round(spot2[2])), int(round(spot2[1]))), patch_size)
-                        )
-                    ]
-                )
+                if (config['parameters']['debugCentroid'] == '1'):
+                    print(datas[0])
+                    valueY[0][patch_size[2] // 2][patch_size[1] // 2] = 0
+                    valueX[0][patch_size[2] // 2][patch_size[1] // 2] = 0
+
+                stackY.append(valueY)
+                stackX.append(valueX)
             else:
-                # stackX.append(
-                #     datas[0][
-                #         tuple(
-                #             slice(
-                #                 _r - (_p//2),
-                #                 _r + _p-(_p//2)
-                #             )
-                #             for _r,_p in zip((int(frame1), int(round(spot1[2])), int(round(spot1[1]))), patch_size)
-                #         )
-                #     ]
-                # )
-                basisY = (int(round(spot1[2])) // patch_size[2]) * patch_size[2]
-                basisX = (int(round(spot1[1])) // patch_size[1]) * patch_size[1]
-                stackX.append([datas[0][frame1,
+                basisY = (int(spot1[2]) // patch_size[2]) * patch_size[2]
+                basisX = (int(spot1[1]) // patch_size[1]) * patch_size[1]
+                valueX = [datas[1][frame1,
                                  basisY:basisY + patch_size[2],
                                  basisX:basisX + patch_size[1],
-                                 ]])
+                                 ]]
 
-                basisY = (int(round(spot2[2])) // patch_size[2]) * patch_size[2]
-                basisX = (int(round(spot2[1])) // patch_size[1]) * patch_size[1]
-                stackY.append([datas[1][frame2,
+                basisY = (int(spot1[2]) // patch_size[2]) * patch_size[2]
+                basisX = (int(spot1[1]) // patch_size[1]) * patch_size[1]
+                valueY = [datas[0][frame2,
                                  basisY:basisY + patch_size[2],
                                  basisX:basisX + patch_size[1],
-                                 ]])
+                                 ]]
+
+                if (config['parameters']['debugCentroid'] == '1'):
+                    valueY[0][int(spot2[2]) % patch_size[2]][int(spot2[1]) % patch_size[1]] = 0
+                    valueX[0][int(spot1[2]) % patch_size[2]][int(spot1[1]) % patch_size[1]] = 0
+
+                stackY.append(valueY)
+                stackX.append(valueX)
             ## extract image part
             if (len(stackX) == n_samples):
                 break;
@@ -430,11 +418,11 @@ def createPatches(
         channel is None or patch_size[channel]==x.shape[channel] or _raise(ValueError('extracted patches must contain all channels.'))
 
         name = pathx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
-        print("spotname : ", name)
         _Y,_X = sample_patches_from_multiple_stacks((y,x), config, patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots[name])
 
         s = slice(i*n_patches_per_image,(i+1) * n_patches_per_image)
-        X[s], Y[s] = normalization(_X,_Y, x,y,mask,channel) # if error here : not enough patches found, you have to create lower patches or lower the localize gradient
+
+        X[s], Y[s] = normalization(_X, _Y, x, y, mask, channel) # if error here : not enough patches found, you have to create lower patches or lower the localize gradient
 
     if shuffle:
         shuffle_inplace(X,Y)
