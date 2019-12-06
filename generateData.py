@@ -441,7 +441,7 @@ list_common_spots = None
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-#localizeSpots(config) # taking i thresholdPrecision
+localizeSpots(config) # taking i thresholdPrecision
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
