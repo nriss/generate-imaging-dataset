@@ -74,7 +74,7 @@ def identifySpots(config):
     pairs = [(f, p/config['path']['target_dir']/f.name) for f in chain(*((p/sd).glob(pattern) for sd in [config['path']['source_dir']]))]
     len(pairs) > 0 or _raise(FileNotFoundError("Didn't find any hdf5 files containing spot localisation."))
     pairNumber = 0
-    nearbyOffset = 2 # avoid that there are spots nearby
+    nearbyOffset = int(config['parameters']['offsetSpots']) # avoid that there are spots nearby
     numberOfPointsUnderThreshold = 0
     resultDict = {}
     for fx, fy in pairs: #fx and fy are path to files x and y
@@ -89,7 +89,7 @@ def identifySpots(config):
         with h5py.File(fx, 'r') as f:
             with h5py.File(fy, 'r') as g:
                 done = False
-                print("1) Charging localization files")
+                print("1) Charging localization files: ", fx)
                 dataX = list(f['locs']) #taking so much time... X images
                 dataY = list(g['locs']) #taking so much time... Y images
 
@@ -381,7 +381,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_test',
+config['path'] = {'basepath': 'data_500',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"
@@ -393,16 +393,16 @@ config['parameters'] = {}
 # Localize parameters #
 #######################
 # gradient parameter for localization, higer gradient need best defined spots to be considered
-config['parameters']['localizeGradient'] = '5000'
+config['parameters']['localizeGradient'] = '7000'
 # The threshold precision is the limit of acceptation of localisation precision of spots, in pixel, estimated by cramer-rao lower bound of the maximum likelihood fit
-config['parameters']['thresholdPrecision'] = '1'
+config['parameters']['thresholdPrecision'] = '0.3'
 
 
 ############################
 # Generate data parameters #
 ############################
 # Threshold distance in (sub)pixels to consider two spots as the same (0.1 is great)
-config['parameters']['thresholdDistance'] = '1'
+config['parameters']['thresholdDistance'] = '0.3'
 # Order the list of paired spots ?
 config['parameters']['spotOrder'] = 'none' #possible value : 'intensity' / 'none'
 # Authorize multiple spots on a patch ?
@@ -413,11 +413,13 @@ config['parameters']['multipleSpot'] = '0' #possible value : '1' for yes / '0' f
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 20)
-config['parameters']['n_patches_per_image'] = '65'
+config['parameters']['n_patches_per_image'] = '75'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes
 config['parameters']['centralSpot'] = '0'
+# avoid spots nerby the patch,
+config['parameters']['offsetSpots'] = '4' #in px
 
 
 ####################
@@ -439,7 +441,7 @@ list_common_spots = None
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-localizeSpots(config) # taking i thresholdPrecision
+#localizeSpots(config) # taking i thresholdPrecision
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot

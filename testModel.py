@@ -17,27 +17,28 @@ from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.io import load_training_data
 from csbdeep.models import Config, CARE
 
-(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
+#(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
 
 model = CARE(config=None, name='my_model', basedir='models')
 # training model
 #history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
 
-plt.figure(figsize=(12,10))
-_P = model.keras_model.predict(X_val[3:8])
-_P_mean  = _P[...,:(_P.shape[-1]//2)]
-_P_scale = _P[...,(_P.shape[-1]//2):]
-plot_some(X_val[3:8],Y_val[3:8],_P_mean,_P_scale,pmax=99.5)
-plt.suptitle('5 example validation patches\n'
-             'first row: input (source),  '
-             'second row: target (ground truth),  '
-             'third row: predicted Laplace mean,  '
-             'forth row: predicted Laplace scale');
-plt.show()
+# plt.figure(figsize=(12,10))
+# _P = model.keras_model.predict(X_val[3:8])
+# _P_mean  = _P[...,:(_P.shape[-1]//2)]
+# _P_scale = _P[...,(_P.shape[-1]//2):]
+# plot_some(X_val[3:8],Y_val[3:8],_P_mean,_P_scale,pmax=99.5)
+# plt.suptitle('5 example validation patches\n'
+#              'first row: input (source),  '
+#              'second row: target (ground truth),  '
+#              'third row: predicted Laplace mean,  '
+#              'forth row: predicted Laplace scale');
+# plt.show()
 
 
-y = imread("data_ome_tif/net/1_MMStack_Pos0.ome.tif")
-x = imread("data_ome_tif/flou/1_MMStack_Pos0.ome.tif")
+#y = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/spectralSRes/pos1DO1_1/pos1DO1_1_MMStack_Pos0.ome.tif")
+#x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/spectralSRes/pos1DO2_1/pos1DO2_1_MMStack_Pos0.ome.tif")
+x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/beadsAnalysis_Nicolas/pos1_20mw_1/1.tif")
 
 #x = imread("1_20mw_1_MMStack_Pos0.ome.tif")
 restored = model.predict(x[20], "YX", normalizer=None) #axes?
