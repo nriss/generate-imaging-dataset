@@ -26,13 +26,16 @@ from csbdeep.utils import plot_some
 '''
 
 def localizeSpots(config):
-    path_X = config['path']['basepath'] + "/" + config['path']['target_dir']
-    path_Y = config['path']['basepath'] + "/" + config['path']['source_dir']
+    path_X = config['path']['basepath'] + "/" + config['path']['source_dir']
+    path_Y = config['path']['basepath'] + "/" + config['path']['target_dir']
     from localizeDots.localize import launchLocalize
     # Look for spots for tif files in the path_X directory
     locsTarget = launchLocalize(path_X, config)
     # Look for spots for tif files in the path_Y directory
     locsSource = launchLocalize(path_Y, config)
+
+
+
 
 #########################
 # Identify common spots #
@@ -52,9 +55,17 @@ def localizeSpots(config):
 def identifySpots(config):
     thresholdDistance = float(config['parameters']['thresholdDistance'])
     patchSize = int(config['parameters']['patchSize'])
+    patchSizeX = int(config['parameters']['patchSizeX'])
+
     images_per_patches = int(config['parameters']['n_patches_per_image'])
     xDim = int(config['parameters']['xDim'])
     yDim = int(config['parameters']['yDim'])
+
+    ##############################
+    # Only considering the spots # --> Avoid out of bound exceptions
+    ##############################
+    XThreshold =  int(config['parameters']['XThreshold'])
+
 
     from itertools import chain
     import h5py, math
@@ -77,7 +88,7 @@ def identifySpots(config):
     nearbyOffset = int(config['parameters']['offsetSpots']) # avoid that there are spots nearby
     numberOfPointsUnderThreshold = 0
     resultDict = {}
-    for fx, fy in pairs: #fx and fy are path to files x and y
+    for fx, fy in pairs: #fx and fy are path to files x (source) and y (target)
         pairNumber = pairNumber + 1
         print("------------------------------------------")
         print("--------- Processing pair {} of {}".format(pairNumber, len(pairs)), "---------")
@@ -110,7 +121,11 @@ def identifySpots(config):
                     if frame > frameNumber:
                         frameNumber = frame
                     try:
-                        dictYSpots[str(frame)].append(e)
+                        ##############################
+                        # Only considering the spots # --> Avoid out of bound exceptions
+                        ##############################
+                        if e[1] < int(config['parameters']['XThreshold']):
+                            dictYSpots[str(frame)].append(e)
                     except KeyError:
                         dictYSpots[str(frame)] = []
 
@@ -124,7 +139,7 @@ def identifySpots(config):
                     except KeyError:
                         dictXSpots[str(frame)] = []
 
-                for dX in dataX:
+                for dX in dataX: # source image
                     Xposx = dX[1] # x position in image X
                     Xposy = dX[2]
                     indent += 1
@@ -133,7 +148,9 @@ def identifySpots(config):
                     # Not considering X spots near border # --> Avoid out of bound exceptions
                     #######################################
                     if config['parameters']['centralSpot'] == '1':
-                        if ((Xposx - thresholdDistance < (patchSize / 2)) or (Xposx + thresholdDistance > xDim - (patchSize / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
+                        # if ((Xposx - thresholdDistance < (patchSize / 2)) or (Xposx + thresholdDistance > xDim - (patchSize / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
+                        #     continue;
+                        if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
                             continue;
 
                     ######################################
@@ -160,10 +177,6 @@ def identifySpots(config):
                                         break;
                             if not alone:
                                 continue
-                            # TODO : with 0
-                            # TODO : with 0 verif y
-                            # TODO : with 0 verif x
-                        #TO BE DONE
 
                     print("Percentage done: {}%, pair number: {}".format(math.trunc(indent*100/len(dataX)), len(pairSet)), end = '\r')
                     #xVal = [Xposx < b[1] + thresholdDistance and Xposx > b[1] - thresholdDistance for b in dataY]
@@ -171,7 +184,7 @@ def identifySpots(config):
                     for frame in range(0, frameNumber):
                         if exitFlag:
                             break; #a spot has already been found for this spot on X image
-                        for dY in dictYSpots[str(frame)]:
+                        for dY in dictYSpots[str(frame)]: #target image
                             ####################
                             # dX and dY Format #
                             ####################
@@ -196,10 +209,10 @@ def identifySpots(config):
 
                             #######################################
                             # Not considering Y spots near border # --> Avoid out of bound exceptions
-                            #######################################
-                            if config['parameters']['centralSpot'] == '1':
-                                if ((Yposx - thresholdDistance < (patchSize / 2)) or (Yposx + thresholdDistance > xDim - (patchSize / 2)) or (Yposy - thresholdDistance < (patchSize / 2)) or (Yposy + thresholdDistance > yDim - (patchSize / 2))):
-                                    continue;
+                            ####################################### --> Not needed because already verified before
+                            # if config['parameters']['centralSpot'] == '1':
+                            #     if ((Yposx - thresholdDistance < (patchSize / 2)) or (Yposx + thresholdDistance > xDim - (patchSize / 2)) or (Yposy - thresholdDistance < (patchSize / 2)) or (Yposy + thresholdDistance > yDim - (patchSize / 2))):
+                            #         continue;
 
                             ####################################################
                             # Verifying that X and Y spots are not too distant # --> I think it is a little perf improvement
@@ -213,7 +226,6 @@ def identifySpots(config):
                             dist = math.sqrt( (Xposx - Yposx) ** 2 + (Xposy - Yposy) ** 2 )
 
                             if (dist < thresholdDistance): # Pair found !
-
                                 ######################################
                                 # Verifying that the Y spot is alone #
                                 ######################################
@@ -236,33 +248,30 @@ def identifySpots(config):
                                                     break;
                                         if not alone:
                                             continue #ignoring this spot
-                                    #if config['parameters']['centralSpot'] == '0':
-                                        # TODO : with 0 verif y
-                                    #TO BE DONE
+
                                 numberOfPointsUnderThreshold += 1
-                                pairSet.append([dist, dX, dY])
-                                numberFound +=1
+                                pairSet.append([dist, dX, dY]) # distance, target, source
+                                numberFound += 1
                                 exitFlag = True
-                                #TODO : look if there are other spots nearby
                                 break;
-                    if (numberFound >= images_per_patches * 2):
+
+                    if (numberFound >= images_per_patches * int(config['parameters']['patchMultiplier'])):
                         done = True
                         print("---> Number of pairs found : {} <---               ".format(len(pairSet)), end = '\r')
                         print()
+
                         #ordering
                         if (config['parameters']['spotOrder'] not in ["none", "None"]):
                             print("5) Ordering common spots per interest")
                         if (config['parameters']['spotOrder'] == 'intensity'):
-                            pairSet = sorted(pairSet, key=lambda x: (x[2][3] + x[1][3]), reverse=True) #order by pixel intensity
+                            pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True) #order by pixel intensity (target)
                         elif(config['parameters']['spotOrder'] == 'lp'):
                             pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
 
-                        #saving
                         name = fx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
                         resultDict[name] = pairSet
                         print()
                         break
-
                 if (not done):
                     print("ERROR : NOT ENOUGH PATCHES FOUND")
 
@@ -291,8 +300,7 @@ def identifySpots(config):
     @param config.pathCommonSpots : filename to load common spot
     @param dict_common_spots : list of common spots obtained from localizeSpots function
 '''
-def generateData(config, dict_common_spots=None):
-
+def generateData(config, dict_common_spots=None, shifting=False):
     if (dict_common_spots == None and config['path']['commonSpots'] == None):
         print('/!\\ list_common_spot or fileName_common_spot is not defined in generateData, the pairSpots won\'t be taken into acccount')
     elif (dict_common_spots == None):
@@ -303,9 +311,19 @@ def generateData(config, dict_common_spots=None):
         except OSError as e:
             print("common spots file not found, common spots must be computed before generating data ! (Launch localizeSpots function)")
 
+    #Shift Y axis
+    import copy
+    dictCopy = copy.deepcopy(dict_common_spots)
+    if (shifting):
+        for key in dictCopy.keys():
+            for i in range(0, len(dictCopy[key])):
+                dictCopy[key][i][1][1] =  dictCopy[key][i][1][1] + int(config['parameters']['shift'])
+                dictCopy[key][i][2][1] =  dictCopy[key][i][2][1] + int(config['parameters']['shift'])
+
+
     data = RawData.from_folder(basepath=config['path']['basepath'], source_dirs=[config['path']['source_dir']], target_dir=config['path']['target_dir'])
 
-    X, Y, XY_axes = createPatches(data, config, verbose=True, dict_common_spots=dict_common_spots)#, patch_axes="YX")
+    X, Y, XY_axes = createPatches(data, config, shifting, verbose=True, dict_common_spots=dictCopy)#, patch_axes="YX")
     print("shape of X,Y =", X.shape)
     print("axes  of X,Y =", XY_axes)
 
@@ -381,7 +399,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_500',
+config['path'] = {'basepath': 'data_500_0912',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"
@@ -392,30 +410,41 @@ config['parameters'] = {}
 #######################
 # Localize parameters #
 #######################
-# gradient parameter for localization, higer gradient need best defined spots to be considered
-config['parameters']['localizeGradient'] = '7000'
-# The threshold precision is the limit of acceptation of localisation precision of spots, in pixel, estimated by cramer-rao lower bound of the maximum likelihood fit
-config['parameters']['thresholdPrecision'] = '0.3'
+# gradient parameter for localization,
+# higher gradient need best defined spots to be considered
+config['parameters']['localizeGradient'] = '5000'
+# The threshold precision is the limit of acceptation of localisation precision of spots  (in px),
+# estimated by cramer-rao lower bound of the maximum likelihood fit
+config['parameters']['thresholdPrecision'] = '2'
 
 
 ############################
 # Generate data parameters #
 ############################
 # Threshold distance in (sub)pixels to consider two spots as the same (0.1 is great)
-config['parameters']['thresholdDistance'] = '0.3'
+config['parameters']['thresholdDistance'] = '1'
 # Order the list of paired spots ?
-config['parameters']['spotOrder'] = 'none' #possible value : 'intensity' / 'none'
+config['parameters']['spotOrder'] = 'none' #possible value : 'intensity' / 'none'.
+#ordering the spot per intensity is great for finding spectra
+# find more patches than desired (for better spot ordering)
+config['parameters']['patchMultiplier'] = '2'
 # Authorize multiple spots on a patch ?
-config['parameters']['multipleSpot'] = '0' #possible value : '1' for yes / '0' for not
+config['parameters']['multipleSpot'] = '1' #possible value : '1' for yes / '0' for not
+# X threshold, under which the spots are, to avoid considering the spectral datas.
+config['parameters']['XThreshold'] = '256' #in px
+# shifts the x axis to the left to get the spectral data
+config['parameters']['shift'] = '243' #in px
 
 
 ######################
 # Patches parameters #
 ######################
-# number of patches extracted by image stack (min 20)
-config['parameters']['n_patches_per_image'] = '75'
+# number of patches extracted by image stack (min 10)
+config['parameters']['n_patches_per_image'] = '10'
 #patch size in px
-config['parameters']['patchSize'] = '16'
+config['parameters']['patchSize'] = '32'
+#patch size X is used for spectral patches (X are higher)
+config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 2)
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes
 config['parameters']['centralSpot'] = '0'
 # avoid spots nerby the patch,
@@ -426,8 +455,8 @@ config['parameters']['offsetSpots'] = '4' #in px
 # Other parameters #
 ####################
 #would be great to find dynamically xDim and yDim
-config['parameters']['xDim'] = '512'
-config['parameters']['yDim'] = '256'
+config['parameters']['xDim'] = '500'
+config['parameters']['yDim'] = '200'
 
 
 #########
@@ -436,12 +465,10 @@ config['parameters']['yDim'] = '256'
 config['parameters']['debugCentroid'] = '0' #place a black dot at the center of the spot (for debug purpose only)
 
 
-list_common_spots = None
-
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-localizeSpots(config) # taking i thresholdPrecision
+localizeSpots(config)
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
@@ -451,7 +478,9 @@ list_common_spots = identifySpots(config) #modified by thresholdDistance
 #######################
 # 3) generate patches #
 #######################
-X, Y, XY_axes = generateData(config, list_common_spots)
+X, Y, XY_axes = generateData(config, list_common_spots, False)
+# X is the source patches
+# Y is the target patches (high SNR)
 
 #########################################
 # 4) remove frame axe to have 2D images #

@@ -69,46 +69,42 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
         stackY = [] #target
         for commonSpot in common_spots:
             #distance = commonSpot[0]
-            spot1 = commonSpot[1]
-            spot2 = commonSpot[2]
+            spot1 = commonSpot[1] #X
+            spot2 = commonSpot[2] #Y
             frame1 = commonSpot[1][0]
             frame2 = commonSpot[2][0]
 
             if (config['parameters']['centralSpot'] == '1'):
                 valueX = [datas[1][frame1,
-                                 int(spot1[2]) - patch_size[2] // 2:int(spot1[2]) + patch_size[2] - patch_size[2] // 2,
-                                 int(spot1[1]) - patch_size[1] // 2:int(spot1[1]) + patch_size[1] - patch_size[1] // 2,
+                                 int(spot1[2]) - patch_size[1] // 2:int(spot1[2]) + patch_size[1] - patch_size[1] // 2,
+                                 int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,
                                  ]]
                 valueY = [datas[0][frame2,
-                                 int(spot1[2]) - patch_size[2] // 2:int(spot1[2]) + patch_size[2] - patch_size[2] // 2,
-                                 int(spot1[1]) - patch_size[1] // 2:int(spot1[1]) + patch_size[1] - patch_size[1] // 2,
+                                 int(spot2[2]) - patch_size[1] // 2:int(spot2[2]) + patch_size[1] - patch_size[1] // 2,
+                                 int(spot2[1]) - patch_size[2] // 2:int(spot2[1]) + patch_size[2] - patch_size[2] // 2,
                                  ]]
 
                 if (config['parameters']['debugCentroid'] == '1'):
-                    print(datas[0])
-                    valueY[0][patch_size[2] // 2][patch_size[1] // 2] = 0
-                    valueX[0][patch_size[2] // 2][patch_size[1] // 2] = 0
+                    valueY[0][patch_size[1] // 2][patch_size[2] // 2] = 0
+                    valueX[0][patch_size[1] // 2][patch_size[2] // 2] = 0
 
                 stackY.append(valueY)
                 stackX.append(valueX)
             else:
-                basisY = (int(spot1[2]) // patch_size[2]) * patch_size[2]
-                basisX = (int(spot1[1]) // patch_size[1]) * patch_size[1]
+                basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
+                basisX = (int(spot1[1]) // patch_size[2]) * patch_size[2]
                 valueX = [datas[1][frame1,
-                                 basisY:basisY + patch_size[2],
-                                 basisX:basisX + patch_size[1],
+                                 basisY:basisY + patch_size[1],
+                                 basisX:basisX + patch_size[2],
                                  ]]
-
-                basisY = (int(spot1[2]) // patch_size[2]) * patch_size[2]
-                basisX = (int(spot1[1]) // patch_size[1]) * patch_size[1]
                 valueY = [datas[0][frame2,
-                                 basisY:basisY + patch_size[2],
-                                 basisX:basisX + patch_size[1],
+                                 basisY:basisY + patch_size[1],
+                                 basisX:basisX + patch_size[2],
                                  ]]
 
                 if (config['parameters']['debugCentroid'] == '1'):
-                    valueY[0][int(spot2[2]) % patch_size[2]][int(spot2[1]) % patch_size[1]] = 0
-                    valueX[0][int(spot1[2]) % patch_size[2]][int(spot1[1]) % patch_size[1]] = 0
+                    valueY[0][int(spot2[2]) % patch_size[1]][int(spot2[1]) % patch_size[2]] = 0
+                    valueX[0][int(spot1[2]) % patch_size[1]][int(spot1[1]) % patch_size[2]] = 0
 
                 stackY.append(valueY)
                 stackX.append(valueX)
@@ -116,7 +112,7 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
             if (len(stackX) == n_samples):
                 break;
 
-        res = [np.stack([x]) for x in [stackX, stackY]]
+        res = [np.stack([x]) for x in [stackY, stackX]]
 
     return res
 
@@ -288,6 +284,7 @@ Added list common spots to select only common spots.
 def createPatches(
         raw_data,
         config,
+        shifting      = False,
         dict_common_spots = None,
         patch_axes    = None,
         save_file     = None,
@@ -353,8 +350,10 @@ def createPatches(
       Would allow to work with large data that doesn't fit in memory.
 
     """
-
-    patch_size = (1, int(config['parameters']['patchSize']), int(config['parameters']['patchSize']))
+    if (shifting):
+        patch_size = (1, int(config['parameters']['patchSize']), int(config['parameters']['patchSizeX']))
+    else:
+        patch_size = (1, int(config['parameters']['patchSize']), int(config['parameters']['patchSize']))
     n_patches_per_image = int(config['parameters']['n_patches_per_image'])
 
 
@@ -374,7 +373,7 @@ def createPatches(
     n_transforms = np.prod(tf.size)
     n_images = n_raw_images * n_transforms
     n_patches = n_images * n_patches_per_image
-    n_required_memory_bytes = 2 * n_patches*np.prod(patch_size) * 4
+    n_required_memory_bytes = 2 * n_patches * np.prod(patch_size) * 4
 
     ## memory check
     _memory_check(n_required_memory_bytes)

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 #matplotlib inline
 #config InlineBackend.figure_format = 'retina'
 
-from tifffile import imread
+from tifffile import imread, imsave
 from csbdeep.utils import download_and_extract_zip_file, axes_dict, plot_some, plot_history
 from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.io import load_training_data
@@ -67,6 +67,7 @@ plot_some(np.stack([restored_prob.mean(),restored_prob.scale()]), title_list=[['
 plt.show()
 
 
+imsave("restoredImage.tif", restored)
 
 
 # plt.figure(figsize=(16,10))
