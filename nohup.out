@@ -1,88 +1,0 @@
-    ____  _____________   __________ ____ 
-   / __ \/  _/ ____/   | / ___/ ___// __ \
-  / /_/ // // /   / /| | \__ \\__ \/ / / /
- / _____/ // /___/ ___ |___/ ___/ / /_/ / 
-/_/   /___/\____/_/  |_/____/____/\____/  
-                                          
-------------------------------------------
-Localize - Parameters:
-No       Label           Value     
-1        files           data_ome_tif/net
-2        box_side_length 7         
-3        fit_method      mle       
-4        gradient        5000      
-5        drift           1000      
-6        baseline        0         
-7        sensitivity     1         
-8        gain            1         
-9        qe              1         
-------------------------------------------
-Analyzing folder
-A total of 9 files detected
-------------------------------------------
-------------------------------------------
-Processing /home/nicolas/Bureau/DatasetMicroscopy/data_ome_tif/net/1_100mw_2_MMStack_Pos0.ome.tif, File 1 of 9
-------------------------------------------
-Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Identifying in frame 10 of 5,000Identifying in frame 37 of 5,000Identifying in frame 62 of 5,000Identifying in frame 87 of 5,000Identifying in frame 111 of 5,000Identifying in frame 135 of 5,000Identifying in frame 161 of 5,000Identifying in frame 187 of 5,000Identifying in frame 212 of 5,000Identifying in frame 238 of 5,000Identifying in frame 263 of 5,000Identifying in frame 288 of 5,000Identifying in frame 313 of 5,000Identifying in frame 339 of 5,000Identifying in frame 364 of 5,000Identifying in frame 390 of 5,000Identifying in frame 414 of 5,000Identifying in frame 439 of 5,000Identifying in frame 464 of 5,000Identifying in frame 492 of 5,000Identifying in frame 517 of 5,000Identifying in frame 542 of 5,000Identifying in frame 567 of 5,000Identifying in frame 592 of 5,000Identifying in frame 619 of 5,000Identifying in frame 643 of 5,000Identifying in frame 668 of 5,000Identifying in frame 693 of 5,000Identifying in frame 718 of 5,000Identifying in frame 742 of 5,000Identifying in frame 768 of 5,000Identifying in frame 794 of 5,000Identifying in frame 819 of 5,000Identifying in frame 844 of 5,000Identifying in frame 870 of 5,000Identifying in frame 895 of 5,000Identifying in frame 920 of 5,000Identifying in frame 945 of 5,000Identifying in frame 971 of 5,000Identifying in frame 995 of 5,000Identifying in frame 1,020 of 5,000Identifying in frame 1,046 of 5,000Identifying in frame 1,072 of 5,000Identifying in frame 1,093 of 5,000Identifying in frame 1,118 of 5,000Identifying in frame 1,143 of 5,000Identifying in frame 1,169 of 5,000Identifying in frame 1,193 of 5,000Identifying in frame 1,218 of 5,000Identifying in frame 1,244 of 5,000Identifying in frame 1,268 of 5,000Identifying in frame 1,293 of 5,000Identifying in frame 1,319 of 5,000Identifying in frame 1,344 of 5,000Identifying in frame 1,370 of 5,000Identifying in frame 1,394 of 5,000Identifying in frame 1,419 of 5,000Identifying in frame 1,445 of 5,000Identifying in frame 1,470 of 5,000Identifying in frame 1,495 of 5,000Identifying in frame 1,520 of 5,000Identifying in frame 1,544 of 5,000Identifying in frame 1,571 of 5,000Identifying in frame 1,596 of 5,000Identifying in frame 1,621 of 5,000Identifying in frame 1,646 of 5,000Identifying in frame 1,672 of 5,000Identifying in frame 1,698 of 5,000Identifying in frame 1,722 of 5,000Identifying in frame 1,747 of 5,000Identifying in frame 1,773 of 5,000Identifying in frame 1,799 of 5,000Identifying in frame 1,824 of 5,000Identifying in frame 1,849 of 5,000Identifying in frame 1,872 of 5,000Identifying in frame 1,894 of 5,000Identifying in frame 1,917 of 5,000Identifying in frame 1,938 of 5,000Identifying in frame 1,961 of 5,000Identifying in frame 1,984 of 5,000Identifying in frame 2,011 of 5,000Identifying in frame 2,037 of 5,000Identifying in frame 2,062 of 5,000Identifying in frame 2,084 of 5,000Identifying in frame 2,109 of 5,000Identifying in frame 2,135 of 5,000Identifying in frame 2,160 of 5,000Identifying in frame 2,186 of 5,000Identifying in frame 2,211 of 5,000Identifying in frame 2,236 of 5,000Identifying in frame 2,262 of 5,000Identifying in frame 2,288 of 5,000Identifying in frame 2,312 of 5,000Identifying in frame 2,337 of 5,000Identifying in frame 2,362 of 5,000Identifying in frame 2,386 of 5,000Identifying in frame 2,413 of 5,000Identifying in frame 2,437 of 5,000Identifying in frame 2,462 of 5,000Identifying in frame 2,487 of 5,000Identifying in frame 2,513 of 5,000Identifying in frame 2,539 of 5,000Identifying in frame 2,561 of 5,000Identifying in frame 2,585 of 5,000Identifying in frame 2,609 of 5,000Identifying in frame 2,634 of 5,000Identifying in frame 2,658 of 5,000Identifying in frame 2,684 of 5,000Identifying in frame 2,710 of 5,000Identifying in frame 2,734 of 5,000Identifying in frame 2,759 of 5,000Identifying in frame 2,785 of 5,000Identifying in frame 2,810 of 5,000Identifying in frame 2,835 of 5,000Identifying in frame 2,860 of 5,000Identifying in frame 2,886 of 5,000Identifying in frame 2,911 of 5,000Identifying in frame 2,937 of 5,000Identifying in frame 2,961 of 5,000Identifying in frame 2,982 of 5,000Identifying in frame 3,004 of 5,000Identifying in frame 3,027 of 5,000Identifying in frame 3,050 of 5,000Identifying in frame 3,075 of 5,000Identifying in frame 3,100 of 5,000Identifying in frame 3,127 of 5,000Identifying in frame 3,152 of 5,000Identifying in frame 3,176 of 5,000Identifying in frame 3,202 of 5,000Identifying in frame 3,227 of 5,000Identifying in frame 3,252 of 5,000Identifying in frame 3,278 of 5,000Identifying in frame 3,303 of 5,000Identifying in frame 3,328 of 5,000Identifying in frame 3,353 of 5,000Identifying in frame 3,379 of 5,000Identifying in frame 3,403 of 5,000Identifying in frame 3,430 of 5,000Identifying in frame 3,454 of 5,000Identifying in frame 3,479 of 5,000Identifying in frame 3,506 of 5,000Identifying in frame 3,531 of 5,000Identifying in frame 3,556 of 5,000Identifying in frame 3,581 of 5,000Identifying in frame 3,607 of 5,000Identifying in frame 3,632 of 5,000Identifying in frame 3,657 of 5,000Identifying in frame 3,681 of 5,000Identifying in frame 3,706 of 5,000Identifying in frame 3,732 of 5,000Identifying in frame 3,758 of 5,000Identifying in frame 3,783 of 5,000Identifying in frame 3,808 of 5,000Identifying in frame 3,832 of 5,000Identifying in frame 3,859 of 5,000Identifying in frame 3,884 of 5,000Identifying in frame 3,909 of 5,000Identifying in frame 3,934 of 5,000Identifying in frame 3,961 of 5,000Identifying in frame 3,986 of 5,000Identifying in frame 4,011 of 5,000Identifying in frame 4,038 of 5,000Identifying in frame 4,064 of 5,000Identifying in frame 4,089 of 5,000Identifying in frame 4,116 of 5,000Identifying in frame 4,141 of 5,000Identifying in frame 4,166 of 5,000Identifying in frame 4,192 of 5,000Identifying in frame 4,216 of 5,000Identifying in frame 4,240 of 5,000Identifying in frame 4,264 of 5,000Identifying in frame 4,290 of 5,000Identifying in frame 4,315 of 5,000Identifying in frame 4,342 of 5,000Identifying in frame 4,367 of 5,000Identifying in frame 4,393 of 5,000Identifying in frame 4,419 of 5,000Identifying in frame 4,444 of 5,000Identifying in frame 4,471 of 5,000Identifying in frame 4,497 of 5,000Identifying in frame 4,522 of 5,000Identifying in frame 4,548 of 5,000Identifying in frame 4,574 of 5,000Identifying in frame 4,599 of 5,000Identifying in frame 4,625 of 5,000Identifying in frame 4,649 of 5,000Identifying in frame 4,674 of 5,000Identifying in frame 4,700 of 5,000Identifying in frame 4,725 of 5,000Traceback (most recent call last):
-  File "generateData.py", line 144, in <module>
-    localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
-  File "generateData.py", line 23, in localizeSpots
-    locsNet = launchLocalize(path_X)
-  File "/home/nicolas/Bureau/DatasetMicroscopy/localizeDots/localize.py", line 670, in launchLocalize
-    return _localize(args)
-  File "/home/nicolas/Bureau/DatasetMicroscopy/localizeDots/localize.py", line 528, in _localize
-    sleep(0.2)
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/nicolas/anaconda3/lib/python3.7/concurrent/futures/thread.py", line 40, in _python_exit
-    t.join()
-  File "/home/nicolas/anaconda3/lib/python3.7/threading.py", line 1044, in join
-    self._wait_for_tstate_lock()
-  File "/home/nicolas/anaconda3/lib/python3.7/threading.py", line 1060, in _wait_for_tstate_lock
-    elif lock.acquire(block, timeout):
-KeyboardInterrupt
-    ____  _____________   __________ ____ 
-   / __ \/  _/ ____/   | / ___/ ___// __ \
-  / /_/ // // /   / /| | \__ \\__ \/ / / /
- / _____/ // /___/ ___ |___/ ___/ / /_/ / 
-/_/   /___/\____/_/  |_/____/____/\____/  
-                                          
-------------------------------------------
-Localize - Parameters:
-No       Label           Value     
-1        files           data_ome_tif/net
-2        box_side_length 7         
-3        fit_method      mle       
-4        gradient        5000      
-5        drift           1000      
-6        baseline        0         
-7        sensitivity     1         
-8        gain            1         
-9        qe              1         
-------------------------------------------
-Analyzing folder
-A total of 9 files detected
-------------------------------------------
-------------------------------------------
-Processing /home/nicolas/Bureau/DatasetMicroscopy/data_ome_tif/net/1_100mw_2_MMStack_Pos0.ome.tif, File 1 of 9
-------------------------------------------
-Identifying in frame 4 of 5,000Identifying in frame 4 of 5,000Traceback (most recent call last):
-  File "generateData.py", line 144, in <module>
-    localizeSpots(basepath + "/" + target_dir, basepath + "/" + source_dir)
-  File "generateData.py", line 23, in localizeSpots
-    locsNet = launchLocalize(path_X)
-  File "/home/nicolas/Bureau/DatasetMicroscopy/localizeDots/localize.py", line 670, in launchLocalize
-    return _localize(args)
-  File "/home/nicolas/Bureau/DatasetMicroscopy/localizeDots/localize.py", line 528, in _localize
-    sleep(0.2)
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/nicolas/anaconda3/lib/python3.7/concurrent/futures/thread.py", line 40, in _python_exit
-    t.join()
-  File "/home/nicolas/anaconda3/lib/python3.7/threading.py", line 1044, in join
-    self._wait_for_tstate_lock()
-  File "/home/nicolas/anaconda3/lib/python3.7/threading.py", line 1060, in _wait_for_tstate_lock
-    elif lock.acquire(block, timeout):
-KeyboardInterrupt
