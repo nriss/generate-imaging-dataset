@@ -15,7 +15,7 @@ from csbdeep.models import Config, CARE
 # TRAINING DATA #
 #################
 
-filename = "data_beads_final"
+filename = "data_beads_final_noisy"
 #10% of validation data are used there.
 (X_train,Y_train), (X_val,Y_val), axes = load_training_data(filename + '/patches.npz', validation_split=0.1, verbose=True)
 #(X_train, Y_train), (X_val,Y_val), axes = load_training_data('data/synthetic_disks/data.npz', validation_split=0.1, verbose=True)
@@ -36,7 +36,7 @@ plt.suptitle('5 example validation patches (top row: source, bottom row: target)
 
 # Config object contains: parameters of the underlying neural network, learning rate, number of parameter updates per epoch, loss function, and whether the model is probabilistic or not.
 #epoch can be increased considerably for a well-train model (ex: 400)
-config = Config(axes, n_channel_in, n_channel_out, probabilistic=True, train_steps_per_epoch=200)
+config = Config(axes, n_channel_in, n_channel_out, probabilistic=True, train_steps_per_epoch=100)
 print(config)
 vars(config)
 
@@ -47,7 +47,7 @@ vars(config)
 
 # model instanciation
 #model = CARE(config=None, name='my_model', basedir='models')
-model = CARE(config, 'modelBeadsSpots', basedir='models')
+model = CARE(config, 'modelBeadsSpotsNoisy', basedir='models')
 
 # training model
 history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))

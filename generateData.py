@@ -478,7 +478,7 @@ list_common_spots = None
 #list_common_spots = identifySpots(config) #modified by thresholdDistance
 
 #######################
-# 3) generate patches #
+# 3) generate patches # # set the third parameter to True to get the spectra
 #######################
 X, Y, XY_axes = generateData(config, list_common_spots, False)
 # X is the source patches
