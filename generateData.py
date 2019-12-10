@@ -371,6 +371,7 @@ def showPlot(X, Y, XY_axes):
         plt.figure(figsize=(8,4))
         sl = slice(5*i, 5*(i+1)), 0
         plot_some(X[sl], Y[sl], title_list=[np.arange(sl[0].start,sl[0].stop)]) #X puis Y
+        plt.suptitle('5 example validation patches (top row: source, bottom row: target)');
         plt.show()
 
 
@@ -399,7 +400,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_test',
+config['path'] = {'basepath': 'data_beads_final_noisy',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"

@@ -19,7 +19,7 @@ from csbdeep.models import Config, CARE
 
 #(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
 
-model = CARE(config=None, name='my_model', basedir='models')
+model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
 # training model
 #history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
 
@@ -51,7 +51,7 @@ save_tiff_imagej_compatible('testresult.tif', restored, "YX")
 
 plt.figure(figsize=(16,10))
 plot_some(np.stack([x[20],restored]),
-          title_list=[['low (maximum projection)','CARE (maximum projection)']],
+          title_list=[['source image','predicted (CARE)']],
           pmin=2,pmax=99.8);
 
 plt.show()
