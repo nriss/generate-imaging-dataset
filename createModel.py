@@ -17,7 +17,7 @@ from csbdeep.models import Config, CARE
 
 filename = "data_beads_final"
 #10% of validation data are used there.
-(X_train,Y_train), (X_val,Y_val), axes = load_training_data(filename + '/patches_spectra.npz', validation_split=0.1, verbose=True)
+(X_train,Y_train), (X_val,Y_val), axes = load_training_data(filename + '/patches.npz', validation_split=0.1, verbose=True)
 #(X_train, Y_train), (X_val,Y_val), axes = load_training_data('data/synthetic_disks/data.npz', validation_split=0.1, verbose=True)
 
 print("axes : ", axes)
@@ -47,7 +47,7 @@ vars(config)
 
 # model instanciation
 #model = CARE(config=None, name='my_model', basedir='models')
-model = CARE(config, 'modelBeadsSpectra', basedir='models')
+model = CARE(config, 'modelBeadsSpots', basedir='models')
 
 # training model
 history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))

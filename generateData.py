@@ -399,7 +399,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_500_0912',
+config['path'] = {'basepath': 'data_test',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"
@@ -444,7 +444,7 @@ config['parameters']['n_patches_per_image'] = '30'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
-config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 2)
+config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 4) #A specra is approx 79px.
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes
 config['parameters']['centralSpot'] = '0'
 # avoid spots nearby the patch,
@@ -468,7 +468,7 @@ config['parameters']['debugCentroid'] = '0' #place a black dot at the center of 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-#localizeSpots(config)
+localizeSpots(config)
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
@@ -479,7 +479,7 @@ list_common_spots = None
 #######################
 # 3) generate patches #
 #######################
-X, Y, XY_axes = generateData(config, list_common_spots, False)
+X, Y, XY_axes = generateData(config, list_common_spots, True)
 # X is the source patches
 # Y is the target patches (high SNR)
 
