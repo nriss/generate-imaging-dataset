@@ -480,7 +480,7 @@ list_common_spots = None
 #######################
 # 3) generate patches #
 #######################
-X, Y, XY_axes = generateData(config, list_common_spots, True)
+X, Y, XY_axes = generateData(config, list_common_spots, False)
 # X is the source patches
 # Y is the target patches (high SNR)
 
