@@ -330,12 +330,15 @@ def generateData(config, dict_common_spots=None, shifting=False):
     return X, Y, XY_axes
 
 
-def saveData(config, X, Y, XY_axes):
+def saveData(config, X, Y, XY_axes, spectra):
     ##################
     # Saving patches #
     ##################
     from csbdeep.io import save_training_data
-    save_training_data(config['path']['basepath'] + "/patches", X, Y, XY_axes)
+    if (spectra):
+        save_training_data(config['path']['basepath'] + "/patchesSpectral", X, Y, XY_axes)
+    else:
+        save_training_data(config['path']['basepath'] + "/patches", X, Y, XY_axes)
 
     ######################
     # Saving config data #
@@ -400,7 +403,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_beads_final_noisy',
+config['path'] = {'basepath': 'data_beads_final',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"
@@ -480,7 +483,8 @@ list_common_spots = None
 #######################
 # 3) generate patches # # set the third parameter to True to get the spectra
 #######################
-X, Y, XY_axes = generateData(config, list_common_spots, True)
+spectra = True
+X, Y, XY_axes = generateData(config, list_common_spots, spectra)
 # X is the source patches
 # Y is the target patches (high SNR)
 
@@ -492,7 +496,7 @@ X, Y, XY_axes = removeFrameAxe(X, Y, XY_axes)
 ###################################
 # 5) Save patches on numpy format #
 ###################################
-saveData(config, X, Y, XY_axes)
+saveData(config, X, Y, XY_axes, spectra)
 
 ##################################
 # 6) Show plots of paired images #
