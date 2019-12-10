@@ -469,7 +469,7 @@ config['parameters']['debugCentroid'] = '0' #place a black dot at the center of 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-localizeSpots(config)
+#localizeSpots(config)
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
