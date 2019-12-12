@@ -52,7 +52,7 @@ def localizeSpots(config):
     @config.pathCommonSpots : filename to save common spot
 '''
 
-def identifySpots(config):
+def identifySpots(config, spectra):
     thresholdDistance = float(config['parameters']['thresholdDistance'])
     patchSize = int(config['parameters']['patchSize'])
     patchSizeX = int(config['parameters']['patchSizeX'])
@@ -153,6 +153,9 @@ def identifySpots(config):
                         if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
                             continue;
 
+                    if spectra: #remove the transition between spetra and beads
+                        if (Xposx - thresholdDistance < 75):
+                            continue;
                     ######################################
                     # Verifying that the X spot is alone #
                     ######################################
@@ -336,7 +339,7 @@ def saveData(config, X, Y, XY_axes, spectra):
     ##################
     from csbdeep.io import save_training_data
     if (spectra):
-        save_training_data(config['path']['basepath'] + "/patchesSpectral", X, Y, XY_axes)
+        save_training_data(config['path']['basepath'] + "/patchesSpectralShifted", X, Y, XY_axes)
     else:
         save_training_data(config['path']['basepath'] + "/patches", X, Y, XY_axes)
 
@@ -403,10 +406,10 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_beads_final',
+config['path'] = {'basepath': 'data_500_final',
                     'target_dir': 'target',
                     'source_dir': 'source'}
-config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpots"
+config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpotsShiftedForSpectra"
 
 config['parameters'] = {}
 
@@ -472,13 +475,13 @@ config['parameters']['debugCentroid'] = '0' #place a black dot at the center of 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-#localizeSpots(config)
+localizeSpots(config)
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
 ############################################################
 list_common_spots = None
-#list_common_spots = identifySpots(config) #modified by thresholdDistance
+list_common_spots = identifySpots(config, spectra) #modified by thresholdDistance
 
 #######################
 # 3) generate patches # # set the third parameter to True to get the spectra

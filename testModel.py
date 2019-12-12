@@ -19,7 +19,9 @@ from csbdeep.models import Config, CARE
 
 #(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
 
-model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
+#model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
+model = CARE(config=None, name='modelBeadsSpotsNoisy', basedir='models')
+
 # training model
 #history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
 
@@ -38,10 +40,12 @@ model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
 
 #y = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/spectralSRes/pos1DO1_1/pos1DO1_1_MMStack_Pos0.ome.tif")
 #x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/spectralSRes/pos1DO2_1/pos1DO2_1_MMStack_Pos0.ome.tif")
-x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/beadsAnalysis_Nicolas/pos1_20mw_1/1.tif")
+x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/beadsAnalysis_Nicolas/pos3_50mw_1/pos3_50mw_1_MMStack_Pos0.ome.tif")
+
+imageNumber = 0
 
 #x = imread("1_20mw_1_MMStack_Pos0.ome.tif")
-restored = model.predict(x[20], "YX", normalizer=None) #axes?
+restored = model.predict(x[imageNumber], "YX", normalizer=None) #axes?
 # print(type(test))
 # print(test.ndim, test.shape)
 
@@ -50,13 +54,13 @@ save_tiff_imagej_compatible('testresult.tif', restored, "YX")
 
 
 plt.figure(figsize=(16,10))
-plot_some(np.stack([x[20],restored]),
+plot_some(np.stack([x[imageNumber],restored]),
           title_list=[['source image','predicted (CARE)']],
           pmin=2,pmax=99.8);
 
 plt.show()
 
-restored_prob = model.predict_probabilistic(x[20], "YX", normalizer=None) #axes?
+restored_prob = model.predict_probabilistic(x[imageNumber], "YX", normalizer=None) #axes?
 # print(type(test))
 # print(test.ndim, test.shape)
 
@@ -68,6 +72,7 @@ plt.show()
 
 
 imsave("restoredImage.tif", restored)
+imsave("notRestoredImage.tif", x[imageNumber])
 
 
 # plt.figure(figsize=(16,10))
