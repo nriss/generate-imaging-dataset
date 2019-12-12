@@ -278,8 +278,6 @@ def norm_percentiles(percentiles=sample_percentiles(), relu_last=False):
 
     return _normalize
 
-
-
 def shuffle_inplace(*arrs,**kwargs):
     seed = kwargs.pop('seed', None)
     if seed is None:
@@ -290,11 +288,6 @@ def shuffle_inplace(*arrs,**kwargs):
     for a in arrs:
         rng.set_state(state)
         rng.shuffle(a)
-
-
-
-
-
 
 '''
 Added list common spots to select only common spots.

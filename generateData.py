@@ -276,7 +276,7 @@ def identifySpots(config, spectra):
                         print()
                         break
                 if (not done):
-                    print("ERROR : NOT ENOUGH PATCHES FOUND   :   ", len(pairSet))
+                    print("ERROR : NOT ENOUGH PATCHES FOUND  in ", name, "pair found : ", (pairSet))
                     print()
 
                     #ordering
@@ -442,7 +442,7 @@ config['parameters']['thresholdPrecision'] = '0.3'
 # Generate data parameters #
 ############################
 # Threshold distance in (sub)pixels to consider two spots as the same (0.1 is great)
-config['parameters']['thresholdDistance'] = '0.1'
+config['parameters']['thresholdDistance'] = '0.2'
 # Order the list of paired spots ?
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
 #ordering the spot per intensity is great for finding spectra
