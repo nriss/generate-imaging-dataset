@@ -276,7 +276,7 @@ def identifySpots(config, spectra):
                         print()
                         break
                 if (not done):
-                    print("ERROR : NOT ENOUGH PATCHES FOUND : ", len(pairSet))
+                    print("ERROR : NOT ENOUGH PATCHES FOUND   :   ", len(pairSet))
                     print()
 
                     #ordering
@@ -460,7 +460,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '14'
+config['parameters']['n_patches_per_image'] = '10'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
