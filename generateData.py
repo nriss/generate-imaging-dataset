@@ -276,7 +276,20 @@ def identifySpots(config, spectra):
                         print()
                         break
                 if (not done):
-                    print("ERROR : NOT ENOUGH PATCHES FOUND")
+                    print("ERROR : NOT ENOUGH PATCHES FOUND : ", len(pairSet))
+                    print()
+
+                    #ordering
+                    if (config['parameters']['spotOrder'] not in ["none", "None"]):
+                        print("5) Ordering common spots per interest")
+                    if (config['parameters']['spotOrder'] == 'intensity'):
+                        pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True) #order by pixel intensity (target)
+                    elif(config['parameters']['spotOrder'] == 'lp'):
+                        pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
+
+                    name = fx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
+                    resultDict[name] = pairSet
+                    print()
 
     ####################
     ### SAVING SPOTs ###
@@ -447,7 +460,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '30'
+config['parameters']['n_patches_per_image'] = '14'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
