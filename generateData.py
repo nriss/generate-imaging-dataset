@@ -303,7 +303,7 @@ def identifySpots(config, spectra):
     @param config.pathCommonSpots : filename to load common spot
     @param dict_common_spots : list of common spots obtained from localizeSpots function
 '''
-def generateData(config, spectra, dict_common_spots=None, shifting=False):
+def generateData(config, dict_common_spots=None, shifting=False):
     if (dict_common_spots == None and config['path']['commonSpots'] == None):
         print('/!\\ list_common_spot or fileName_common_spot is not defined in generateData, the pairSpots won\'t be taken into acccount')
     elif (dict_common_spots == None):
@@ -471,6 +471,7 @@ config['parameters']['yDim'] = '200'
 #########
 config['parameters']['debugCentroid'] = '0' #place a black dot at the center of the spot (for debug purpose only)
 
+spectra = True
 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
@@ -486,7 +487,6 @@ list_common_spots = identifySpots(config, spectra) #modified by thresholdDistanc
 #######################
 # 3) generate patches # # set the third parameter to True to get the spectra
 #######################
-spectra = True
 X, Y, XY_axes = generateData(config, list_common_spots, spectra)
 # X is the source patches
 # Y is the target patches (high SNR)
