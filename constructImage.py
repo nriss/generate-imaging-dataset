@@ -20,7 +20,7 @@ from csbdeep.models import Config, CARE
 
 #(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
 
-model = CARE(config=None, name='modelBeadsSpotsNoisy', basedir='.')
+model = CARE(config=None, name='models/modelBeadsSpotsNoisy', basedir='.')
 
 x = imread("/home/nicolas/Bureau/testImageReconstruction100/1_100mw_1_MMStack_Pos0.ome.tif")
 y = imread("/home/nicolas/Bureau/testImageReconstruction100/1_100mw_1_MMStack_Pos0.ome.tif")
