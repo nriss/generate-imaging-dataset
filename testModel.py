@@ -20,7 +20,7 @@ from csbdeep.models import Config, CARE
 #(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
 
 #model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
-model = CARE(config=None, name='modelBeadsSpotsNoisy', basedir='models')
+model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
 
 # training model
 #history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
@@ -40,9 +40,10 @@ model = CARE(config=None, name='modelBeadsSpotsNoisy', basedir='models')
 
 #y = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/spectralSRes/pos1DO1_1/pos1DO1_1_MMStack_Pos0.ome.tif")
 #x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/spectralSRes/pos1DO2_1/pos1DO2_1_MMStack_Pos0.ome.tif")
-x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/beadsAnalysis_Nicolas/pos3_50mw_1/pos3_50mw_1_MMStack_Pos0.ome.tif")
+#x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/beadsAnalysis_Nicolas/pos3_50mw_1/pos3_50mw_1_MMStack_Pos0.ome.tif")
+x = imread("/home/nicolas/Bureau/MicroscopyImaging/extract_spectra.tif")
 
-imageNumber = 0
+imageNumber = 5
 
 #x = imread("1_20mw_1_MMStack_Pos0.ome.tif")
 restored = model.predict(x[imageNumber], "YX", normalizer=None) #axes?
