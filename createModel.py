@@ -36,7 +36,7 @@ plt.suptitle('5 example validation patches (top row: source, bottom row: target)
 
 # Config object contains: parameters of the underlying neural network, learning rate, number of parameter updates per epoch, loss function, and whether the model is probabilistic or not.
 #epoch can be increased considerably for a well-train model (ex: 400)
-config = Config(axes, n_channel_in, n_channel_out, probabilistic=True, train_steps_per_epoch=100)
+config = Config(axes, n_channel_in, n_channel_out, probabilistic=True, train_steps_per_epoch=200)
 print(config)
 vars(config)
 
