@@ -23,13 +23,14 @@ from csbdeep.models import Config, CARE
 model = CARE(config=None, name='modelBeadsSpotsNoisy', basedir='.')
 
 x = imread("/home/nicolas/Bureau/testImageReconstruction100/1_100mw_1_MMStack_Pos0.ome.tif")
+y = imread("/home/nicolas/Bureau/testImageReconstruction100/1_100mw_1_MMStack_Pos0.ome.tif")
 
-#x = imread("1_20mw_1_MMStack_Pos0.ome.tif")
 restored = []
 print("image numbers : ", len(x))
+
 for i in range(0, len(x) - 1):
     if (i % 500 == 0):
         print("Images restored: {}%, number of images: {}".format(math.trunc(i*100/len(x)), len(x)), end = '\r')
-        imsave("restoredImage_1_20mw_1_MMStack_Pos0" + i + ".tif", restored)
-        restored = []
-    restored.append(model.predict(x[i], "YX", normalizer=None)) #axes?
+    y[i] = model.predict(x[i], "YX", normalizer=None) #axes?
+
+imsave("restoredImage_1_100mw_1_MMStack_Pos0.tif", y)
