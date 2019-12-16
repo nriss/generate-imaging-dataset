@@ -449,7 +449,7 @@ config['parameters']['thresholdPrecision'] = '0.4'
 # Generate data parameters #
 ############################
 # Threshold distance in (sub)pixels to consider two spots as the same (0.1 is great)
-config['parameters']['thresholdDistance'] = '0.2'
+config['parameters']['thresholdDistance'] = '0.4'
 # Order the list of paired spots ?
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
 #ordering the spot per intensity is great for finding spectra
@@ -475,7 +475,7 @@ config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) 
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes
 config['parameters']['centralSpot'] = '0'
 # avoid spots nearby the patch,
-config['parameters']['offsetSpots'] = '2' #in px
+config['parameters']['offsetSpots'] = '1' #in px
 
 
 ####################
