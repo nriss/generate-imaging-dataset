@@ -454,7 +454,7 @@ config['parameters']['thresholdDistance'] = '0.4'
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
 #ordering the spot per intensity is great for finding spectra
 # find more patches than desired (for better spot ordering)
-config['parameters']['patchMultiplier'] = '2'
+config['parameters']['patchMultiplier'] = '3'
 # Authorize multiple spots on a patch ?
 config['parameters']['multipleSpot'] = '0' #possible value : '1' for yes / '0' for not
 # X threshold, under which the spots are, to avoid considering the spectral datas.
@@ -467,7 +467,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '20'
+config['parameters']['n_patches_per_image'] = '50'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
