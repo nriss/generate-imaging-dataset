@@ -30,6 +30,9 @@ This script will create a npz file containing pair of image patch needed to buil
 
 This function will use the npz file and CSBDeep functions (cf CSBDeep getting started in https://github.com/CSBDeep/CSBDeep) to compute the CARE model.
 
+4) Run constructImage.py (python constructImage.py)
+
+This function allow to reconstruct an entire stack of images from the CSBDeep model previously trained
 
 About
 -----
