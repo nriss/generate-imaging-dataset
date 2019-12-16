@@ -20,7 +20,7 @@ from csbdeep.models import Config, CARE
 #(X_train,Y_train), (X_val,Y_val), axes = load_training_data('test.npz', validation_split=0.1, verbose=True)
 
 #model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
-model = CARE(config=None, name='modelBeadsSpectra', basedir='models')
+model = CARE(config=None, name='modelBeadsSpectra64_200pepoch_woBorder', basedir='models')
 
 # training model
 #history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))

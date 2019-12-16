@@ -2,7 +2,7 @@
 # TEST MODEL #
 ##############
 '''
-    Python script used to test the model after computing
+    Python script used to test reconstruct a full stack of image
 '''
 
 from __future__ import print_function, unicode_literals, absolute_import, division

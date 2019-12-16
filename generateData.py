@@ -43,13 +43,14 @@ def localizeSpots(config):
 '''
     Function identifySpots
     The goal of the function is to identify the spots which are present on two different images, under a threshold distance (in px).
-    @config : config object
+    @param config : config object
     @config.thresholdDistance : distance in px
     @config.patchSize
     @config.target_dir : folder containing the target images
     @config.source_dir : fonder containing the source images
     @config.image_per_patches : number of images we want per patches (for perf optimization, we are looking for 10 * image_per_patches pairs of dots here).
     @config.pathCommonSpots : filename to save common spot
+    @param spectra : if true, avoid looking at spots with x < 75px to avoid learning on the transition data.
 '''
 
 def identifySpots(config, spectra):
@@ -315,6 +316,7 @@ def identifySpots(config, spectra):
     @param config.n_patches_per_image : number of patches per tif file.
     @param config.pathCommonSpots : filename to load common spot
     @param dict_common_spots : list of common spots obtained from localizeSpots function
+    @param shifting : if we are looking for spectras, shift on ~200px on y axis to get the spectra
 '''
 def generateData(config, dict_common_spots=None, shifting=False):
     if (dict_common_spots == None and config['path']['commonSpots'] == None):
@@ -352,15 +354,19 @@ def saveData(config, X, Y, XY_axes, spectra):
     ##################
     from csbdeep.io import save_training_data
     if (spectra):
-        save_training_data(config['path']['basepath'] + "/patchesSpectralShifted", X, Y, XY_axes)
+        save_training_data(config['path']['patches'] + "_spectral", X, Y, XY_axes)
     else:
-        save_training_data(config['path']['basepath'] + "/patches", X, Y, XY_axes)
+        save_training_data(config['path']['patches'], X, Y, XY_axes)
 
     ######################
     # Saving config data #
     ######################
-    with open(config['path']['basepath'] + '/config', 'w') as configfile:
-        config.write(configfile)
+    if (spectra):
+        with open(config['path']['basepath'] + '/spectral_config', 'w') as configfile:
+            config.write(configfile)
+    else:
+        with open(config['path']['basepath'] + '/config', 'w') as configfile:
+            config.write(configfile)
 
 
 '''
@@ -419,10 +425,11 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_500_final',
+config['path'] = {'basepath': 'data_beads_final_littleNoise',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpotsShiftedForSpectra"
+config['path']['patches'] = config['path']['basepath'] + "/patchesLittleNoise"
 
 config['parameters'] = {}
 
@@ -435,7 +442,7 @@ config['parameters'] = {}
 config['parameters']['localizeGradient'] = '5000'
 # The threshold precision is the limit of acceptation of localisation precision of spots  (in px),
 # estimated by cramer-rao lower bound of the maximum likelihood fit
-config['parameters']['thresholdPrecision'] = '0.3'
+config['parameters']['thresholdPrecision'] = '0.4'
 
 
 ############################
@@ -460,7 +467,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '10'
+config['parameters']['n_patches_per_image'] = '20'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
@@ -468,7 +475,7 @@ config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) 
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes
 config['parameters']['centralSpot'] = '0'
 # avoid spots nearby the patch,
-config['parameters']['offsetSpots'] = '4' #in px
+config['parameters']['offsetSpots'] = '2' #in px
 
 
 ####################
