@@ -467,7 +467,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '50'
+config['parameters']['n_patches_per_image'] = '100'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
