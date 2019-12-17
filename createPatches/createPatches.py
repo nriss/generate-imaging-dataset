@@ -432,7 +432,7 @@ def createPatches(
         channel is None or patch_size[channel]==x.shape[channel] or _raise(ValueError('extracted patches must contain all channels.'))
 
         name = pathx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
-        _Y,_X = sample_patches_from_multiple_stacks((y,x), config, config['parameters']['Spectra'] == 1, patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots[name])
+        _Y,_X = sample_patches_from_multiple_stacks((y,x), config, patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots[name])
 
         s = slice(i*n_patches_per_image,(i+1) * n_patches_per_image)
 
