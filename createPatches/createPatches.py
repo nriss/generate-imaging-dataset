@@ -5,7 +5,7 @@ import numpy as np
 import sys, os, warnings
 
 from tqdm import tqdm
-
+#Adapted from CSBDeep by Nicolas Riss
 
 #((y,x), patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots)
 
@@ -69,14 +69,18 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
         stackY = [] #target
         for commonSpot in common_spots:
             #distance = commonSpot[0]
-            spot1 = commonSpot[1] #X
-            spot2 = commonSpot[2] #Y
+            spot1 = commonSpot[1] #x
+            spot2 = commonSpot[2] #y
             frame1 = commonSpot[1][0]
             frame2 = commonSpot[2][0]
 
-            if config['parameters']['Spectra'] == "1": #centered on X but not on Y, to see the entire spectra
+            ###########################################################################################
+            # Would be interesting to center on X but not on Y, to see the entire spectra on patches. #
+            # However, cause out of bound exception because xdim is higher than ydim for spectras     #
+            ###########################################################################################
+            if config['parameters']['centerOnX'] == "1" and config['parameters']['Spectra'] == "1": #centered on X but not on Y, to see the entire spectra
                 basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
-                basisX = (int(spot1[1]) // patch_size[2]) * patch_size[2]
+
                 valueX = [datas[1][frame1,
                                  basisY:basisY + patch_size[1],
                                  int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,
@@ -87,12 +91,12 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
                                  ]]
 
                 if (config['parameters']['debugCentroid'] == '1'):
-                    valueY[0][int(spot2[2]) % patch_size[1]][int(spot2[1]) % patch_size[2]] = 0
-                    valueX[0][int(spot1[2]) % patch_size[1]][int(spot1[1]) % patch_size[2]] = 0
+                    valueY[0][int(spot2[2]) % patch_size[1]][patch_size[2] // 2] = 0
+                    valueX[0][int(spot1[2]) % patch_size[1]][patch_size[2] // 2] = 0
 
                 stackY.append(valueY)
-                stackX.append(valueX)
-            elif (config['parameters']['centralSpot'] == '1'):
+            #     stackX.append(valueX)
+            if (config['parameters']['centralSpot'] == '1'):
                 valueX = [datas[1][frame1,
                                  int(spot1[2]) - patch_size[1] // 2:int(spot1[2]) + patch_size[1] - patch_size[1] // 2,
                                  int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,

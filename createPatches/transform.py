@@ -8,6 +8,7 @@ from collections import namedtuple
 import sys, os, warnings
 
 from createPatches.utils import _raise, consume, axes_check_and_normalize, axes_dict, move_image_axes
+#Adapted from CSBDeep by Nicolas Riss
 
 
 

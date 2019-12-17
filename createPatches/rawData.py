@@ -6,6 +6,7 @@ from collections import namedtuple
 from itertools import chain
 
 from createPatches.utils import _raise, consume, axes_check_and_normalize, Path, FileNotFoundError
+#Adapted from CSBDeep by Nicolas Riss
 
 
 

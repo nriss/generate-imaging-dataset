@@ -8,6 +8,8 @@ from csbdeep.data.generate import no_background_patches
 from createPatches.createPatches import createPatches
 from createPatches.rawData import RawData
 from csbdeep.utils import plot_some
+# author Nicolas Riss (nicolas.riss22@gmail.com)
+
 
 #np.set_printoptions(threshold=sys.maxsize)
 # uncomment ot write entire data (not splitting) may consume time
@@ -163,6 +165,10 @@ def identifySpots(config):
                             #remove the transition between spetra and beads
                             #do not consider spots if the spectra can be in the transition area
                             continue;
+                        if config['parameters']['centerOnX'] == "1"
+                            if (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)):
+                                # remove spots too close from the right border to avoid OOB exception
+                                continue;
 
                     ######################################
                     # Verifying that the X spot is alone #
@@ -471,6 +477,8 @@ config['parameters']['patchSize'] = '16'
 config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 4) #A specra is approx 79px.
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes
 config['parameters']['centralSpot'] = '0'
+# Would you like to center only on X ? is interesting for spectra, to see it entirely
+config['parameters']['centerOnX'] = '0'
 # avoid spots nearby the patch,
 config['parameters']['offsetSpots'] = '1' #in px
 

@@ -5,6 +5,7 @@ import numpy as np
 import json
 import collections
 from six.moves import range, zip, map, reduce, filter
+#Adapted from CSBDeep by Nicolas Riss
 
 
 try:

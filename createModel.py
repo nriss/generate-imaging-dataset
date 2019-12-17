@@ -9,7 +9,7 @@ from csbdeep.utils import download_and_extract_zip_file, axes_dict, plot_some, p
 from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.io import load_training_data
 from csbdeep.models import Config, CARE
-
+# author Nicolas Russ (nicolas.riss22@gmail.com)
 
 #################
 # TRAINING DATA #

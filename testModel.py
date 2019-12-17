@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from tifffile import imread, imsave
 from csbdeep.utils import plot_some
 from csbdeep.models import CARE
+# author Nicolas Russ (nicolas.riss22@gmail.com)
 
 #x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/ruler_first_acquisition/pos3_50mw_1/pos3_50mw_1_MMStack_Pos0.ome.tif")
 #x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/extract_spectra_beads_littleNoise.tif") #read an image as input
