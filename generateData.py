@@ -266,39 +266,25 @@ def identifySpots(config, spectra):
                                 exitFlag = True
                                 break;
 
-                    if (numberFound >= images_per_patches * int(config['parameters']['patchMultiplier'])):
-                        done = True
-                        print("---> Number of pairs found : {} <---               ".format(len(pairSet)), end = '\r')
-                        print()
+                print("---> Number of pairs found : {} <---               ".format(len(pairSet)), end = '\r')
+                print()
 
-                        #ordering
-                        if (config['parameters']['spotOrder'] not in ["none", "None"]):
-                            print("5) Ordering common spots per interest")
-                        if (config['parameters']['spotOrder'] == 'intensity'):
-                            #order by pixel intensity (target), could be interesting to get the most beautiful spectras
-                            pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True)
-                        elif(config['parameters']['spotOrder'] == 'lp'):
-                            pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
+                #ordering
+                if (config['parameters']['spotOrder'] not in ["none", "None"]):
+                    print("5) Ordering common spots per interest")
+                if (config['parameters']['spotOrder'] == 'intensity'):
+                    #order by pixel intensity (target), could be interesting to get the most beautiful spectras
+                    pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True)
+                elif(config['parameters']['spotOrder'] == 'lp'):
+                    pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
 
-                        name = fx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
-                        resultDict[name] = pairSet
-                        print()
-                        break
-                if (not done):
-                    print("ERROR : NOT ENOUGH PATCHES FOUND  in ", name, "pair found : ", (pairSet))
-                    print("it will cause an error later, you should create new stack with more common points or increase the thresholdDistance")
-                    print()
+                name = fx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
+                resultDict[name] = pairSet
+                print()
 
-                    #ordering
-                    if (config['parameters']['spotOrder'] not in ["none", "None"]):
-                        print("5) Ordering common spots per interest")
-                    if (config['parameters']['spotOrder'] == 'intensity'):
-                        pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True) #order by pixel intensity (target)
-                    elif(config['parameters']['spotOrder'] == 'lp'):
-                        pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
-
-                    name = fx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
-                    resultDict[name] = pairSet
+                if (len(pairSet) < images_per_patches):
+                    print("ERROR : NOT ENOUGH PATCHES FOUND  in ", name, "pair found : ", len(pairSet))
+                    print("it can cause an error later, you should acquire new stacks with more common points or increase the thresholdDistance")
                     print()
 
     ####################
@@ -462,9 +448,7 @@ config['parameters']['thresholdPrecision'] = '0.5'
 config['parameters']['thresholdDistance'] = '0.6'
 # Order the list of paired spots ?
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
-#ordering the spot per intensity is great for finding spectra
-# find more patches than desired (for better spot ordering)
-config['parameters']['patchMultiplier'] = '4'
+
 # Authorize multiple spots on a patch ?
 config['parameters']['multipleSpot'] = '0' #possible value : '1' for yes / '0' for not
 # X threshold, under which the spots are, to avoid considering the spectral datas.
