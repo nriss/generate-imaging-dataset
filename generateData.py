@@ -145,7 +145,7 @@ def identifySpots(config, spectra):
                     except KeyError:
                         dictXSpots[str(frame)] = []
 
-                for dX in dataX: # source image
+                for dX in dataX: # spots in source image, randomized order
                     Xposx = dX[1] # x position in image X
                     Xposy = dX[2]
                     indent += 1
@@ -159,7 +159,7 @@ def identifySpots(config, spectra):
                             continue;
 
                     if spectra:
-                        if (Xposx - thresholdDistance < 75):
+                        if (Xposx < 75):
                             #remove the transition between spetra and beads
                             #do not consider spots if the spectra can be in the transition area
                             continue;
@@ -176,8 +176,6 @@ def identifySpots(config, spectra):
                                     if abs(sp[1] - dX[1]) < (patchSize + nearbyOffset) / 2 and abs(sp[2] - dX[2]) < (patchSize + nearbyOffset) / 2:
                                         alone = False;
                                         break;
-                            if not alone:
-                                continue
                         if config['parameters']['centralSpot'] == '0':
                             basisX = (int(dX[1]) // patchSize) * patchSize
                             basisY = (int(dX[2]) // patchSize) * patchSize
@@ -186,16 +184,18 @@ def identifySpots(config, spectra):
                                     if sp[1] - basisX  >= 0 - nearbyOffset and sp[1] - basisX <= patchSize + nearbyOffset and sp[2] - basisY >= 0 - nearbyOffset and sp[2] - basisY <= patchSize + nearbyOffset:
                                         alone = False;
                                         break;
-                            if not alone:
-                                continue
+                        if not alone:
+                            continue
 
                     print("Percentage done: {}%, pair number: {}".format(math.trunc(indent*100/len(dataX)), len(pairSet)), end = '\r')
-                    #xVal = [Xposx < b[1] + thresholdDistance and Xposx > b[1] - thresholdDistance for b in dataY]
+
+
+                    
                     exitFlag = False
-                    for frame in range(0, frameNumber):
+                    for frame in random.shuffle(list(range(0, frameNumber))): #randomized frame in target image
                         if exitFlag:
                             break; #a spot has already been found for this spot on X image, avoid finding multiple patches for a same spot
-                        for dY in dictYSpots[str(frame)]: #target image
+                        for dY in random.shuffle(dictYSpots[str(frame)]): #randomized spots in target image
                             ####################
                             # dX and dY Format #
                             ####################
@@ -241,9 +241,9 @@ def identifySpots(config, spectra):
                                 # Verifying that the Y spot is alone #
                                 ######################################
                                 if config['parameters']['multipleSpot'] == '0':
+                                    alone = True
                                     if config['parameters']['centralSpot'] == '1':
                                         # verif y
-                                        alone = True
                                         for sp in dictYSpots[str(frame)]:
                                             if sp != dY:
                                                 if abs(sp[1] - dY[1]) < (patchSize + nearbyOffset) / 2 and abs(sp[2] - dY[2]) < (patchSize + nearbyOffset) / 2:
@@ -257,8 +257,8 @@ def identifySpots(config, spectra):
                                                 if sp[1] - basisX  >= 0 - nearbyOffset and sp[1] - basisX <= patchSize + nearbyOffset and sp[2] - basisY >= 0 - nearbyOffset and sp[2] - basisY <= patchSize + nearbyOffset:
                                                     alone = False;
                                                     break;
-                                        if not alone:
-                                            continue #ignoring this spot
+                                    if not alone:
+                                        continue #ignoring this spot
 
                                 numberOfPointsUnderThreshold += 1
                                 pairSet.append([dist, dX, dY]) # distance, target, source
