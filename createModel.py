@@ -15,10 +15,11 @@ from csbdeep.models import Config, CARE
 # TRAINING DATA #
 #################
 
-filename = "data_beads_final_littleNoise"
-modelName = "modelBeadsLittleNoiseSpectra64_200pepoch_woBorder"
+folderName = "data_ruler_final"
+filename = "patchesRuler_spectral_XCentered.npz"
+modelName = "modelRulerSpectralXCentered"
 #10% of validation data are used there.
-(X_train,Y_train), (X_val,Y_val), axes = load_training_data(filename + '/patchesLittleNoise_spectral.npz', validation_split=0.1, verbose=True)
+(X_train,Y_train), (X_val,Y_val), axes = load_training_data(folderName + filename, validation_split=0.05, verbose=True)
 #(X_train, Y_train), (X_val,Y_val), axes = load_training_data('data/synthetic_disks/data.npz', validation_split=0.1, verbose=True)
 
 print("axes : ", axes)
