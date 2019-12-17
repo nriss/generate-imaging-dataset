@@ -159,16 +159,17 @@ def identifySpots(config):
                         # don't consider the spot near the border --> will raise an out of bound exception if we center spots
                         if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
                             continue;
+                    elif config['parameters']['centralSpot'] == '2':
+                        if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)):
+                            # remove spots too close from the right border to avoid OOB exception
+                            continue;
 
                     if config['parameters']['Spectra'] == '1':
                         if (Xposx < 65):
                             #remove the transition between spetra and beads
                             #do not consider spots if the spectra can be in the transition area
                             continue;
-                        if config['parameters']['centerOnX'] == "1":
-                            if (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)):
-                                # remove spots too close from the right border to avoid OOB exception
-                                continue;
+
 
                     ######################################
                     # Verifying that the X spot is alone #
@@ -475,11 +476,9 @@ config['parameters']['n_patches_per_image'] = '25'
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
 config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 4) #A specra is approx 79px.
-# Would you like to centralize the spot in patches ? '0' for no, '1' for yes
-config['parameters']['centralSpot'] = '0'
-# Would you like to center only on X ? is interesting for spectra, to see it entirely
-config['parameters']['centerOnX'] = '0'
-# avoid spots nearby the patch,
+# Would you like to centralize the spot in patches ? '0' for no, '1' for yes, '2' to center on X only (interesting for spectra, to see it entirely)
+config['parameters']['centralSpot'] = '2'
+# Would you like to center only on X ? i
 config['parameters']['offsetSpots'] = '1' #in px
 
 

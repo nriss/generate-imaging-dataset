@@ -74,11 +74,11 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
             frame1 = commonSpot[1][0]
             frame2 = commonSpot[2][0]
 
-            ###########################################################################################
-            # Would be interesting to center on X but not on Y, to see the entire spectra on patches. #
-            # However, cause out of bound exception because xdim is higher than ydim for spectras     #
-            ###########################################################################################
-            if config['parameters']['centerOnX'] == "1" and config['parameters']['Spectra'] == "1": #centered on X but not on Y, to see the entire spectra
+            ############################################################################################
+            #               Center on X but not on Y, to see the entire spectra on patches.            #
+            # Would be interesting to randomize to add like +/- 50px to make the spectra position vary #
+            ############################################################################################
+            if config['parameters']['centralSpot'] == "2": #centered on X but not on Y, to see the entire spectra
                 basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
 
                 valueX = [datas[1][frame1,
@@ -96,7 +96,7 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
 
                 stackY.append(valueY)
             #     stackX.append(valueX)
-            if (config['parameters']['centralSpot'] == '1'):
+            elif (config['parameters']['centralSpot'] == '1'):
                 valueX = [datas[1][frame1,
                                  int(spot1[2]) - patch_size[1] // 2:int(spot1[2]) + patch_size[1] - patch_size[1] // 2,
                                  int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,
