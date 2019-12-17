@@ -50,10 +50,10 @@ def localizeSpots(config):
     @config.source_dir : fonder containing the source images
     @config.image_per_patches : number of images we want per patches (for perf optimization, we are looking for 10 * image_per_patches pairs of dots here).
     @config.pathCommonSpots : filename to save common spot
-    @param spectra : if true, avoid looking at spots with x < 75px to avoid learning on the transition data.
+    @config.spectra : if "1", avoid looking at spots with x < 65px to avoid learning on the transition data.
 '''
 
-def identifySpots(config, spectra):
+def identifySpots(config):
     # Loading parameters
     thresholdDistance = float(config['parameters']['thresholdDistance'])
     patchSize = int(config['parameters']['patchSize'])
@@ -158,8 +158,8 @@ def identifySpots(config, spectra):
                         if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
                             continue;
 
-                    if spectra:
-                        if (Xposx < 75):
+                    if config['parameters']['Spectra'] == '1':
+                        if (Xposx < 65):
                             #remove the transition between spetra and beads
                             #do not consider spots if the spectra can be in the transition area
                             continue;
@@ -277,6 +277,7 @@ def identifySpots(config, spectra):
                 if (config['parameters']['spotOrder'] == 'intensity'):
                     #order by pixel intensity (target), could be interesting to get the most beautiful spectras
                     pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True)
+                    #IMPROVEMENT: would be interesting to take the most intense source spot if there are multiple corresponding spots
                 elif(config['parameters']['spotOrder'] == 'lp'):
                     pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
 
@@ -313,9 +314,9 @@ def identifySpots(config, spectra):
     @param config.n_patches_per_image : number of patches per tif file.
     @param config.pathCommonSpots : filename to load common spot
     @param dict_common_spots : list of common spots obtained from localizeSpots function
-    @param shifting : if we are looking for spectras, shift on ~200px on y axis to get the spectra
+    @param config.spectra : if we are looking for spectras, shift on ~200px on y axis to get the spectra
 '''
-def generateData(config, dict_common_spots=None, shifting=False):
+def generateData(config, dict_common_spots=None):
     if (dict_common_spots == None and config['path']['commonSpots'] == None):
         print('/!\\ list_common_spot or fileName_common_spot is not defined in generateData, the pairSpots won\'t be taken into acccount')
     elif (dict_common_spots == None):
@@ -329,7 +330,7 @@ def generateData(config, dict_common_spots=None, shifting=False):
     #Shift Y axis
     import copy
     dictCopy = copy.deepcopy(dict_common_spots)
-    if (shifting):
+    if (config['parameters']['Spectra'] == '1'): #shifting
         for key in dictCopy.keys():
             for i in range(0, len(dictCopy[key])):
                 # shifting on y axis to get the spectra instead of spot
@@ -339,19 +340,19 @@ def generateData(config, dict_common_spots=None, shifting=False):
 
     data = RawData.from_folder(basepath=config['path']['basepath'], source_dirs=[config['path']['source_dir']], target_dir=config['path']['target_dir'])
 
-    X, Y, XY_axes = createPatches(data, config, shifting, verbose=True, dict_common_spots=dictCopy)#, patch_axes="YX")
+    X, Y, XY_axes = createPatches(data, config, verbose=True, dict_common_spots=dictCopy)#, patch_axes="YX")
     print("shape of X,Y =", X.shape)
     print("axes  of X,Y =", XY_axes)
 
     return X, Y, XY_axes
 
 
-def saveData(config, X, Y, XY_axes, spectra):
+def saveData(config, X, Y, XY_axes):
     ##################
     # Saving patches #
     ##################
     from csbdeep.io import save_training_data
-    if (spectra):
+    if (config['parameters']['Spectra'] == "1"):
         save_training_data(config['path']['patches'] + "_spectral", X, Y, XY_axes)
     else:
         save_training_data(config['path']['patches'], X, Y, XY_axes)
@@ -359,7 +360,7 @@ def saveData(config, X, Y, XY_axes, spectra):
     ######################
     # Saving config data #
     ######################
-    if (spectra):
+    if (config['parameters']['Spectra'] == "1"):
         with open(config['path']['basepath'] + '/spectral_config', 'w') as configfile:
             config.write(configfile)
     else:
@@ -481,14 +482,13 @@ config['parameters']['offsetSpots'] = '1' #in px
 #  xDim and yDim are used in generateData to see if spots are too close to the border
 config['parameters']['xDim'] = '500'
 config['parameters']['yDim'] = '200'
-
+config['parameters']['Spectra'] = '1'
 
 #########
 # DEBUG #
 #########
 config['parameters']['debugCentroid'] = '0' #place a black dot at the center of the spot (for debug purpose only)
 
-spectra = False
 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
@@ -499,12 +499,12 @@ spectra = False
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
 ############################################################
 list_common_spots = None
-list_common_spots = identifySpots(config, spectra) #modified by thresholdDistance
+list_common_spots = identifySpots(config) #modified by thresholdDistance
 
 #######################
-# 3) generate patches # # set the third parameter to True to get the spectra
+# 3) generate patches #
 #######################
-X, Y, XY_axes = generateData(config, list_common_spots, spectra)
+X, Y, XY_axes = generateData(config, list_common_spots)
 # X is the source patches
 # Y is the target patches (high SNR)
 
@@ -516,7 +516,7 @@ X, Y, XY_axes = removeFrameAxe(X, Y, XY_axes)
 ###################################
 # 5) Save patches on numpy format #
 ###################################
-saveData(config, X, Y, XY_axes, spectra)
+saveData(config, X, Y, XY_axes)
 
 ##################################
 # 6) Show plots of paired images #

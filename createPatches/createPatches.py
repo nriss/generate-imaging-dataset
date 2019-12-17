@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 #((y,x), patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots)
 
-def sample_patches_from_multiple_stacks(datas, config, shifting, patch_size, n_samples, datas_mask=None, patch_filter=None, common_spots = None, verbose=False):
+def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, datas_mask=None, patch_filter=None, common_spots = None, verbose=False):
     """ sample matching patches of size `patch_size` from all arrays in `datas` """
     # TODO: some of these checks are already required in 'create_patches'
     len(patch_size)==datas[0].ndim or _raise(ValueError())
@@ -74,7 +74,25 @@ def sample_patches_from_multiple_stacks(datas, config, shifting, patch_size, n_s
             frame1 = commonSpot[1][0]
             frame2 = commonSpot[2][0]
 
-            if (config['parameters']['centralSpot'] == '1'):
+            if config['parameters']['Spectra'] == "1": #centered on X but not on Y, to see the entire spectra
+                basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
+                basisX = (int(spot1[1]) // patch_size[2]) * patch_size[2]
+                valueX = [datas[1][frame1,
+                                 basisY:basisY + patch_size[1],
+                                 int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,
+                                 ]]
+                valueY = [datas[0][frame2,
+                                 basisY:basisY + patch_size[1],
+                                 int(spot2[1]) - patch_size[2] // 2:int(spot2[1]) + patch_size[2] - patch_size[2] // 2,
+                                 ]]
+
+                if (config['parameters']['debugCentroid'] == '1'):
+                    valueY[0][int(spot2[2]) % patch_size[1]][int(spot2[1]) % patch_size[2]] = 0
+                    valueX[0][int(spot1[2]) % patch_size[1]][int(spot1[1]) % patch_size[2]] = 0
+
+                stackY.append(valueY)
+                stackX.append(valueX)
+            elif (config['parameters']['centralSpot'] == '1'):
                 valueX = [datas[1][frame1,
                                  int(spot1[2]) - patch_size[1] // 2:int(spot1[2]) + patch_size[1] - patch_size[1] // 2,
                                  int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,
@@ -90,24 +108,7 @@ def sample_patches_from_multiple_stacks(datas, config, shifting, patch_size, n_s
 
                 stackY.append(valueY)
                 stackX.append(valueX)
-            # elif shifting: #centered on X but not on Y, to see the entire spectra
-            #     basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
-            #     basisX = (int(spot1[1]) // patch_size[2]) * patch_size[2]
-            #     valueX = [datas[1][frame1,
-            #                      basisY:basisY + patch_size[1],
-            #                      int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,
-            #                      ]]
-            #     valueY = [datas[0][frame2,
-            #                      basisY:basisY + patch_size[1],
-            #                      int(spot2[1]) - patch_size[2] // 2:int(spot2[1]) + patch_size[2] - patch_size[2] // 2,
-            #                      ]]
-            #
-            #     if (config['parameters']['debugCentroid'] == '1'):
-            #         valueY[0][int(spot2[2]) % patch_size[1]][int(spot2[1]) % patch_size[2]] = 0
-            #         valueX[0][int(spot1[2]) % patch_size[1]][int(spot1[1]) % patch_size[2]] = 0
-            #
-            #     stackY.append(valueY)
-            #     stackX.append(valueX)
+
             else:
                 basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
                 basisX = (int(spot1[1]) // patch_size[2]) * patch_size[2]
@@ -295,7 +296,6 @@ Added list common spots to select only common spots.
 def createPatches(
         raw_data,
         config,
-        shifting      = False,
         dict_common_spots = None,
         patch_axes    = None,
         save_file     = None,
@@ -361,7 +361,7 @@ def createPatches(
       Would allow to work with large data that doesn't fit in memory.
 
     """
-    if (shifting):
+    if (config['parameters']['Spectra'] == "1"):
         patch_size = (1, int(config['parameters']['patchSize']), int(config['parameters']['patchSizeX']))
     else:
         patch_size = (1, int(config['parameters']['patchSize']), int(config['parameters']['patchSize']))
@@ -428,7 +428,7 @@ def createPatches(
         channel is None or patch_size[channel]==x.shape[channel] or _raise(ValueError('extracted patches must contain all channels.'))
 
         name = pathx.absolute().as_posix().split('/')[-1].replace('_locs.hdf5', '').replace('.tif', '').replace('.ome', '')
-        _Y,_X = sample_patches_from_multiple_stacks((y,x), config, shifting, patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots[name])
+        _Y,_X = sample_patches_from_multiple_stacks((y,x), config, config['parameters']['Spectra'] == 1, patch_size, n_patches_per_image, mask, patch_filter, dict_common_spots[name])
 
         s = slice(i*n_patches_per_image,(i+1) * n_patches_per_image)
 
