@@ -459,7 +459,7 @@ config['parameters']['thresholdPrecision'] = '0.5'
 # Generate data parameters #
 ############################
 # Threshold distance in (sub)pixels to consider two spots as the same (0.1 is great)
-config['parameters']['thresholdDistance'] = '0.5'
+config['parameters']['thresholdDistance'] = '0.6'
 # Order the list of paired spots ?
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
 #ordering the spot per intensity is great for finding spectra
@@ -477,7 +477,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '30'
+config['parameters']['n_patches_per_image'] = '25'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
