@@ -80,7 +80,7 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
             ############################################################################################
             if config['parameters']['centralSpot'] == "2": #centered on X but not on Y, to see the entire spectra
                 basisY = (int(spot1[2]) // patch_size[1]) * patch_size[1]
-
+                print(spot1, spot2)
                 valueX = [datas[1][frame1,
                                  basisY:basisY + patch_size[1],
                                  int(spot1[1]) - patch_size[2] // 2:int(spot1[1]) + patch_size[2] - patch_size[2] // 2,

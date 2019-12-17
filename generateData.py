@@ -160,7 +160,7 @@ def identifySpots(config):
                         if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
                             continue;
                     elif config['parameters']['centralSpot'] == '2':
-                        if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2))):
+                        if ((Xposx - thresholdDistance <= (patchSizeX / 2)) or (Xposx + thresholdDistance >= XThreshold - (patchSizeX / 2))):
                             # remove spots too close from the right border to avoid OOB exception
                             continue;
 
@@ -204,7 +204,7 @@ def identifySpots(config):
                     for frame in RandomizedFrames: #randomized frame in target image
                         if exitFlag:
                             break; #a spot has already been found for this spot on X image, avoid finding multiple patches for a same spot
-                        for dY in sorted(dictYSpots[str(frame)], key=lambda k: random.random()): #randomized spots in target image
+                        for dY in dictYSpots[str(frame)]:
                             ####################
                             # dX and dY Format #
                             ####################
@@ -226,6 +226,9 @@ def identifySpots(config):
                             '''
                             Yposx = dY[1]
                             Yposy = dY[2]
+
+                            if Yposx + thresholdDistance > Xposx:
+                                break; #useless to go further
 
                             #######################################
                             # Not considering Y spots near border # --> Avoid out of bound exceptions
@@ -251,6 +254,17 @@ def identifySpots(config):
                                 ######################################
                                 if config['parameters']['multipleSpot'] == '0':
                                     alone = True
+                                    if config['parameters']['centralSpot'] == '2':
+                                        basisY = (int(dY[2]) // patchSize) * patchSize
+                                        for sp in dictYSpots[str(frame)]:
+                                            if sp != dY:
+                                                if abs(sp[1] - dY[1]) < (patchSize + nearbyOffset) / 2:
+                                                    alone = False;
+                                                    break;
+
+                                                if (sp[2] - basisY >= 0 - nearbyOffset and sp[2] - basisY <= patchSize + nearbyOffset):
+                                                    alone = False;
+                                                    break;
                                     if config['parameters']['centralSpot'] == '1':
                                         # verif y
                                         for sp in dictYSpots[str(frame)]:
@@ -506,7 +520,7 @@ config['parameters']['debugCentroid'] = '0' #place a black dot at the center of 
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
 ############################################################
 list_common_spots = None
-list_common_spots = identifySpots(config) #modified by thresholdDistance
+#list_common_spots = identifySpots(config) #modified by thresholdDistance
 
 #######################
 # 3) generate patches #
