@@ -450,7 +450,7 @@ config['parameters']['thresholdDistance'] = '0.6'
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
 
 # Authorize multiple spots on a patch ?
-config['parameters']['multipleSpot'] = '0' #possible value : '1' for yes / '0' for not
+config['parameters']['multipleSpot'] = '1' #possible value : '1' for yes / '0' for not
 # X threshold, under which the spots are, to avoid considering the spectral datas.
 config['parameters']['XThreshold'] = '256' #in px
 # shifts the x axis to the left to get the spectral data

@@ -127,7 +127,7 @@ def sample_patches_from_multiple_stacks(datas, config, shifting, patch_size, n_s
                 stackY.append(valueY)
                 stackX.append(valueX)
             ## extract image part
-            if (len(stackX) == n_samples):
+            if (len(stackX) == n_samples): # stopping when we have enough images
                 break;
 
         res = [np.stack([x]) for x in [stackY, stackX]]
