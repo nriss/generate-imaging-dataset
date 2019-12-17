@@ -190,9 +190,9 @@ def identifySpots(config, spectra):
                     print("Percentage done: {}%, pair number: {}".format(math.trunc(indent*100/len(dataX)), len(pairSet)), end = '\r')
 
 
-                    
+
                     exitFlag = False
-                    for frame in random.shuffle(list(range(0, frameNumber))): #randomized frame in target image
+                    for frame in random.shuffle(range(0, frameNumber)): #randomized frame in target image
                         if exitFlag:
                             break; #a spot has already been found for this spot on X image, avoid finding multiple patches for a same spot
                         for dY in random.shuffle(dictYSpots[str(frame)]): #randomized spots in target image
