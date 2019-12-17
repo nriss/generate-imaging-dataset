@@ -165,7 +165,7 @@ def identifySpots(config):
                             #remove the transition between spetra and beads
                             #do not consider spots if the spectra can be in the transition area
                             continue;
-                        if config['parameters']['centerOnX'] == "1"
+                        if config['parameters']['centerOnX'] == "1":
                             if (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)):
                                 # remove spots too close from the right border to avoid OOB exception
                                 continue;
