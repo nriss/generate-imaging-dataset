@@ -95,7 +95,7 @@ def sample_patches_from_multiple_stacks(datas, config, patch_size, n_samples, da
                     valueX[0][int(spot1[2]) % patch_size[1]][patch_size[2] // 2] = 0
 
                 stackY.append(valueY)
-            #     stackX.append(valueX)
+                stackX.append(valueX)
             elif (config['parameters']['centralSpot'] == '1'):
                 valueX = [datas[1][frame1,
                                  int(spot1[2]) - patch_size[1] // 2:int(spot1[2]) + patch_size[1] - patch_size[1] // 2,
