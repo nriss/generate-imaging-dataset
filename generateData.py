@@ -192,10 +192,12 @@ def identifySpots(config, spectra):
 
 
                     exitFlag = False
-                    for frame in random.shuffle(range(0, frameNumber)): #randomized frame in target image
+                    RandomizedFrames = sorted(list(range(0, frameNumber)), key=lambda k: random.random())
+
+                    for frame in RandomizedFrames: #randomized frame in target image
                         if exitFlag:
                             break; #a spot has already been found for this spot on X image, avoid finding multiple patches for a same spot
-                        for dY in random.shuffle(dictYSpots[str(frame)]): #randomized spots in target image
+                        for dY in sorted(dictYSpots[str(frame)], key=lambda k: random.random()): #randomized spots in target image
                             ####################
                             # dX and dY Format #
                             ####################
@@ -486,7 +488,7 @@ config['parameters']['yDim'] = '200'
 #########
 config['parameters']['debugCentroid'] = '0' #place a black dot at the center of the spot (for debug purpose only)
 
-spectra = True
+spectra = False
 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
