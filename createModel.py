@@ -47,12 +47,16 @@ vars(config)
 #Possibility to monitor the progress using TensorBoat (see https://www.tensorflow.org/guide/summaries_and_tensorboard)
 
 # model instanciation
-#model = CARE(config=None, name='my_model', basedir='models')
-model = CARE(config, modelName, basedir='models')
+#model = CARE(config=None, name='my_model', basedir='models') # used to load a model
+model = CARE(config, modelName, basedir='models') # used to train a new model
 
 # training model
 history = model.train(X_train,Y_train, validation_data=(X_val,Y_val))
 
+
+#########################################
+# Show 5 examples of validation patches #
+#########################################
 plt.figure(figsize=(12,10))
 _P = model.keras_model.predict(X_val[:5])
 _P_mean  = _P[...,:(_P.shape[-1]//2)]

@@ -26,12 +26,12 @@ from csbdeep.utils import plot_some
 '''
 
 def localizeSpots(config):
-    path_X = config['path']['basepath'] + "/" + config['path']['source_dir']
-    path_Y = config['path']['basepath'] + "/" + config['path']['target_dir']
     from localizeDots.localize import launchLocalize
     # Look for spots for tif files in the path_X directory
+    path_X = config['path']['basepath'] + "/" + config['path']['source_dir']
     locsTarget = launchLocalize(path_X, config)
     # Look for spots for tif files in the path_Y directory
+    path_Y = config['path']['basepath'] + "/" + config['path']['target_dir']
     locsSource = launchLocalize(path_Y, config)
 
 
@@ -54,6 +54,7 @@ def localizeSpots(config):
 '''
 
 def identifySpots(config, spectra):
+    # Loading parameters
     thresholdDistance = float(config['parameters']['thresholdDistance'])
     patchSize = int(config['parameters']['patchSize'])
     patchSizeX = int(config['parameters']['patchSizeX'])
@@ -62,10 +63,10 @@ def identifySpots(config, spectra):
     xDim = int(config['parameters']['xDim'])
     yDim = int(config['parameters']['yDim'])
 
-    ##############################
-    # Only considering the spots # --> Avoid out of bound exceptions
-    ##############################
-    XThreshold =  int(config['parameters']['XThreshold'])
+    ##############################################################
+    # Only considering the spots, not taking account the spectra #
+    ##############################################################
+    XThreshold =  int(config['parameters']['XThreshold']) # Avoid out of bound exceptions
 
 
     from itertools import chain
@@ -81,6 +82,9 @@ def identifySpots(config, spectra):
     except (ImportError,AttributeError):
         from pathlib2 import Path
 
+    ##########################################################
+    # Loading hdf5 files containing localization information #
+    ##########################################################
     p = Path(config['path']['basepath'])
     pattern = '*.hdf5'
     pairs = [(f, p/config['path']['target_dir']/f.name) for f in chain(*((p/sd).glob(pattern) for sd in [config['path']['source_dir']]))]
@@ -89,6 +93,7 @@ def identifySpots(config, spectra):
     nearbyOffset = int(config['parameters']['offsetSpots']) # avoid that there are spots nearby
     numberOfPointsUnderThreshold = 0
     resultDict = {}
+
     for fx, fy in pairs: #fx and fy are path to files x (source) and y (target)
         pairNumber = pairNumber + 1
         print("------------------------------------------")
@@ -105,7 +110,7 @@ def identifySpots(config, spectra):
                 dataX = list(f['locs']) #taking so much time... X images
                 dataY = list(g['locs']) #taking so much time... Y images
 
-                print("2) randomizing X spots")
+                print("2) randomizing X spots") #Avoid bias, we don't want to take spots from frame 1 in priority !
                 dataX = sorted(dataX, key=lambda k: random.random()) # spot localization on X images
 
                 print("3) Looking for common spots")
@@ -122,10 +127,10 @@ def identifySpots(config, spectra):
                     if frame > frameNumber:
                         frameNumber = frame
                     try:
-                        ##############################
-                        # Only considering the spots # --> Avoid out of bound exceptions
-                        ##############################
-                        if e[1] < int(config['parameters']['XThreshold']):
+                        #####################################################################################
+                        # Only considering the spots below the threshold, we don't want to consider spectra #
+                        #####################################################################################
+                        if e[1] < XThreshold: #--> Avoid out of bound exceptions
                             dictYSpots[str(frame)].append(e)
                     except KeyError:
                         dictYSpots[str(frame)] = []
@@ -149,14 +154,16 @@ def identifySpots(config, spectra):
                     # Not considering X spots near border # --> Avoid out of bound exceptions
                     #######################################
                     if config['parameters']['centralSpot'] == '1':
-                        # if ((Xposx - thresholdDistance < (patchSize / 2)) or (Xposx + thresholdDistance > xDim - (patchSize / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
-                        #     continue;
+                        # don't consider the spot near the border --> will raise an out of bound exception if we center spots
                         if ((Xposx - thresholdDistance < (patchSizeX / 2)) or (Xposx + thresholdDistance > XThreshold - (patchSizeX / 2)) or (Xposy - thresholdDistance < (patchSize / 2)) or (Xposy + thresholdDistance > yDim - (patchSize / 2))):
                             continue;
 
-                    if spectra: #remove the transition between spetra and beads
+                    if spectra:
                         if (Xposx - thresholdDistance < 75):
+                            #remove the transition between spetra and beads
+                            #do not consider spots if the spectra can be in the transition area
                             continue;
+
                     ######################################
                     # Verifying that the X spot is alone #
                     ######################################
@@ -187,7 +194,7 @@ def identifySpots(config, spectra):
                     exitFlag = False
                     for frame in range(0, frameNumber):
                         if exitFlag:
-                            break; #a spot has already been found for this spot on X image
+                            break; #a spot has already been found for this spot on X image, avoid finding multiple patches for a same spot
                         for dY in dictYSpots[str(frame)]: #target image
                             ####################
                             # dX and dY Format #
@@ -268,7 +275,8 @@ def identifySpots(config, spectra):
                         if (config['parameters']['spotOrder'] not in ["none", "None"]):
                             print("5) Ordering common spots per interest")
                         if (config['parameters']['spotOrder'] == 'intensity'):
-                            pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True) #order by pixel intensity (target)
+                            #order by pixel intensity (target), could be interesting to get the most beautiful spectras
+                            pairSet = sorted(pairSet, key=lambda x: x[1][3] + x[2][3], reverse=True)
                         elif(config['parameters']['spotOrder'] == 'lp'):
                             pairSet = sorted(pairSet, key=lambda x: (x[1][7] + x[1][8])/2) #order by localization precision on x/y mean
 
@@ -278,6 +286,7 @@ def identifySpots(config, spectra):
                         break
                 if (not done):
                     print("ERROR : NOT ENOUGH PATCHES FOUND  in ", name, "pair found : ", (pairSet))
+                    print("it will cause an error later, you should create new stack with more common points or increase the thresholdDistance")
                     print()
 
                     #ordering
@@ -335,6 +344,7 @@ def generateData(config, dict_common_spots=None, shifting=False):
     if (shifting):
         for key in dictCopy.keys():
             for i in range(0, len(dictCopy[key])):
+                # shifting on y axis to get the spectra instead of spot
                 dictCopy[key][i][1][1] =  dictCopy[key][i][1][1] + int(config['parameters']['shift'])
                 dictCopy[key][i][2][1] =  dictCopy[key][i][2][1] + int(config['parameters']['shift'])
 
@@ -425,11 +435,11 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_beads_final_littleNoise',
+config['path'] = {'basepath': 'data_rulerçfinal',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpotsShiftedForSpectra"
-config['path']['patches'] = config['path']['basepath'] + "/patchesLittleNoise"
+config['path']['patches'] = config['path']['basepath'] + "/patchesRuler"
 
 config['parameters'] = {}
 
@@ -454,7 +464,7 @@ config['parameters']['thresholdDistance'] = '0.4'
 config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
 #ordering the spot per intensity is great for finding spectra
 # find more patches than desired (for better spot ordering)
-config['parameters']['patchMultiplier'] = '3'
+config['parameters']['patchMultiplier'] = '4'
 # Authorize multiple spots on a patch ?
 config['parameters']['multipleSpot'] = '0' #possible value : '1' for yes / '0' for not
 # X threshold, under which the spots are, to avoid considering the spectral datas.
@@ -467,7 +477,7 @@ config['parameters']['shift'] = '243' #in px
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '200'
+config['parameters']['n_patches_per_image'] = '40'
 #patch size in px
 config['parameters']['patchSize'] = '16'
 #patch size X is used for spectral patches (X are higher)
@@ -482,6 +492,7 @@ config['parameters']['offsetSpots'] = '1' #in px
 # Other parameters #
 ####################
 #would be great to find dynamically xDim and yDim
+#  xDim and yDim are used in generateData to see if spots are too close to the border
 config['parameters']['xDim'] = '500'
 config['parameters']['yDim'] = '200'
 
