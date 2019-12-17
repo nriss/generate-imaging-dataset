@@ -435,7 +435,7 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_rulerçfinal',
+config['path'] = {'basepath': 'data_ruler_final',
                     'target_dir': 'target',
                     'source_dir': 'source'}
 config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpotsShiftedForSpectra"
