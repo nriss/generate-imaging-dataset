@@ -28,7 +28,7 @@ This script will create a npz file containing pair of image patch needed to buil
 
 3) Run createModel.py (python createModel.py)
 
-This function will use the npz file and CSBDeep functions (cf CSBDeep getting started in https://github.com/CSBDeep/CSBDeep) to compute the CARE model.
+The script will call CSBDeep functions and use the npz file to train the CARE model (cf CSBDeep getting started in https://github.com/CSBDeep/CSBDeep).
 
 4) Run constructImage.py (python constructImage.py)
 
