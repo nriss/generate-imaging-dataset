@@ -14,23 +14,29 @@ import matplotlib.pyplot as plt
 from tifffile import imread, imsave
 from csbdeep.utils import plot_some
 from csbdeep.models import CARE
-# author Nicolas Russ (nicolas.riss22@gmail.com)
+# author Nicolas Riss (nicolas.riss22@gmail.com)
 
-#x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/ruler_first_acquisition/pos3_50mw_1/pos3_50mw_1_MMStack_Pos0.ome.tif")
-#x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/extract_spectra_beads_littleNoise.tif") #read an image as input
-x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/extract_spectra_ruler.tif") #read an image as input
+##########################
+# read an image as input #
+##########################
+x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/ruler_first_acquisition/pos3_50mw_1/pos3_50mw_1_MMStack_Pos0.ome.tif")
+#x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/extract_spectra_beads_littleNoise.tif")
+#x = imread("/home/nicolas/Bureau/MicroscopyImaging/Images/extract_spectra_ruler.tif") #read an image as input
 
 imageNumber = 29 #number of the image to read on the stack
 
-modelName = "modelBeadsSpectra64_200pepoch_woBorder" #without noise
+modelName = "modelRulerSpectralXCentered" #without noise
 #modelName = "modelBeadsLittleNoiseSpectra64_200pepoch_woBorder" #noise added
 
+########################
+# predict output image #
+########################
 model = CARE(config=None, name=modelName, basedir='models')
 restored = model.predict(x[imageNumber], "YX", normalizer=None)
 
-###################
-# Show the result #
-###################
+###############
+# Show result #
+###############
 plt.figure(figsize=(16,10))
 plot_some(np.stack([x[imageNumber], restored]),
           title_list=[['source image','predicted (CARE)']],

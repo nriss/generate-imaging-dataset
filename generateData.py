@@ -226,9 +226,9 @@ def identifySpots(config):
                             '''
                             Yposx = dY[1]
                             Yposy = dY[2]
-
-                            if Yposx + thresholdDistance > Xposx:
-                                break; #useless to go further
+                            #
+                            # if Yposx + thresholdDistance > Xposx:
+                            #     break; #useless to go further
 
                             #######################################
                             # Not considering Y spots near border # --> Avoid out of bound exceptions
@@ -445,11 +445,11 @@ def showPlot(X, Y, XY_axes):
 
 import configparser
 config = configparser.ConfigParser()
-config['path'] = {'basepath': 'data_ruler_final',
-                    'target_dir': 'target',
-                    'source_dir': 'source'}
-config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpotsShiftedForSpectra"
-config['path']['patches'] = config['path']['basepath'] + "/patchesRuler"
+config['path'] = {'basepath': 'data_test_beads', #test:'data_test_beads'
+                    'target_dir': 'target', #test: 'target'
+                    'source_dir': 'source'} #test: 'source'
+config['path']['commonSpots'] = config['path']['basepath'] + "/commonSpotsTest" #test: config['path']['basepath'] + "/commonSpotsTest"
+config['path']['patches'] = config['path']['basepath'] + "/patchTest" #test: config['path']['basepath'] + "/patchTest"
 
 config['parameters'] = {}
 
@@ -459,41 +459,44 @@ config['parameters'] = {}
 #######################
 # gradient parameter for localization,
 # higher gradient need best defined spots to be considered
-config['parameters']['localizeGradient'] = '5000'
+config['parameters']['localizeGradient'] = '5000' #test: '5000'
 # The threshold precision is the limit of acceptation of localisation precision of spots  (in px),
 # estimated by cramer-rao lower bound of the maximum likelihood fit
-config['parameters']['thresholdPrecision'] = '0.5'
+config['parameters']['thresholdPrecision'] = '2' #test: '2'
 
 
 ############################
 # Generate data parameters #
 ############################
 # Threshold distance in (sub)pixels to consider two spots as the same (0.1 is great)
-config['parameters']['thresholdDistance'] = '0.6'
+config['parameters']['thresholdDistance'] = '2'  #test: '2'
 # Order the list of paired spots ?
-config['parameters']['spotOrder'] = 'intensity' #possible value : 'intensity' / 'none'.
+# possible value : 'intensity' / 'none'.
+config['parameters']['spotOrder'] = 'none' #test: 'none'
 
 # Authorize multiple spots on a patch ?
-config['parameters']['multipleSpot'] = '1' #possible value : '1' for yes / '0' for not
-# X threshold, under which the spots are, to avoid considering the spectral datas.
-config['parameters']['XThreshold'] = '256' #in px
-# shifts the x axis to the left to get the spectral data
-config['parameters']['shift'] = '243' #in px
+#possible value : '1' for yes / '0' for not
+config['parameters']['multipleSpot'] = '1' #test: '1'
+# X threshold in px, under which the spots are, to avoid considering the spectral datas.
+config['parameters']['XThreshold'] = '256' #test: 256
+# shifts the x axis in pxto the left to get the spectral data
+config['parameters']['shift'] = '243' #test : 243
 
 
 ######################
 # Patches parameters #
 ######################
 # number of patches extracted by image stack (min 10)
-config['parameters']['n_patches_per_image'] = '50'
+config['parameters']['n_patches_per_image'] = '50' #test: '20'
 #patch size in px
-config['parameters']['patchSize'] = '16'
+config['parameters']['patchSize'] = '16' #test: '16'
 #patch size X is used for spectral patches (X are higher)
-config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 4) #A specra is approx 79px.
+#A specra is approx 79px.
+config['parameters']['patchSizeX'] = str(int(config['parameters']['patchSize']) * 4) #test: str(int(config['parameters']['patchSize']) * 4)
 # Would you like to centralize the spot in patches ? '0' for no, '1' for yes, '2' to center on X only (interesting for spectra, to see it entirely)
-config['parameters']['centralSpot'] = '2'
-# Would you like to center only on X ? i
-config['parameters']['offsetSpots'] = '1' #in px
+config['parameters']['centralSpot'] = '0' #test: '0'
+# Would you like to center only on X ? in px
+config['parameters']['offsetSpots'] = '2' #test: '2'
 
 
 ####################
@@ -501,26 +504,27 @@ config['parameters']['offsetSpots'] = '1' #in px
 ####################
 #would be great to find dynamically xDim and yDim
 #  xDim and yDim are used in generateData to see if spots are too close to the border
-config['parameters']['xDim'] = '500'
-config['parameters']['yDim'] = '200'
-config['parameters']['Spectra'] = '1'
+config['parameters']['xDim'] = '500' #test: '500'
+config['parameters']['yDim'] = '500' #test: '500'
+config['parameters']['Spectra'] = '0' #test: '0'
 
 #########
 # DEBUG #
 #########
-config['parameters']['debugCentroid'] = '0' #place a black dot at the center of the spot (for debug purpose only)
+#place a black dot at the center of the spot (for debug purpose only)
+config['parameters']['debugCentroid'] = '0' #test: '0'
 
 
 ######################################
 # 1) localization of spots (picasso) # parameters : thresholdPrecision, localizeGradient
 ######################################
-#localizeSpots(config)
+localizeSpots(config)
 
 ############################################################
 # 2) identification of common spots between the two stacks # Parameters : thresholdDistance, centralSpot
 ############################################################
 list_common_spots = None
-#list_common_spots = identifySpots(config) #modified by thresholdDistance
+list_common_spots = identifySpots(config) #modified by thresholdDistance
 
 #######################
 # 3) generate patches #
